@@ -1,0 +1,1435 @@
+/* ------------------------------------------------------------------ base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+body {
+  font-family: 'Quicksand', ui-rounded, -apple-system, 'Segoe UI', system-ui, sans-serif;
+  background: #e7ebf2;
+  color: #222835;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* ------------------------------------------------------------ phone frame */
+.page {
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: #eef1f5;
+}
+.phone {
+  width: min(390px, 100dvw);
+  height: min(844px, 100dvh);
+  border-radius: 40px;
+  border: 1px solid rgba(35, 50, 90, 0.08);
+  box-shadow: 0 12px 40px rgba(45, 65, 110, 0.1);
+  overflow: hidden;
+}
+@media (max-width: 520px), (max-height: 880px) {
+  .phone {
+    width: 100dvw;
+    height: 100dvh;
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+  }
+}
+.screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #f6f8fb;
+  --fab-base: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+/* ------------------------------------------------------------ quiet app
+   Type does the work: one confident title, 600-weight row titles, quiet
+   body, faint tabular times. No cards, no chips — hairlines and air. */
+.status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px 0;
+  font-family: -apple-system, system-ui, sans-serif; /* native phone chrome */
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(34, 40, 53, 0.82);
+}
+.status svg {
+  opacity: 0.6;
+}
+.app-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 40px 28px 0;
+}
+.kicker {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  color: #aab3c2;
+  margin-bottom: 5px;
+}
+.app-head h1 {
+  font-family: 'Baloo 2', 'Quicksand', ui-rounded, system-ui, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: #232935;
+}
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e8edf5;
+  color: #8792a3;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  margin-bottom: 3px;
+}
+.list {
+  padding: 10px 28px 0;
+}
+.group {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b3bcca;
+  margin: 26px 0 2px;
+}
+.row {
+  padding: 15px 0 14px;
+}
+.row + .row {
+  border-top: 1px solid rgba(34, 44, 66, 0.07);
+}
+.row-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.row h2 {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: #232935;
+}
+.row time {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b3bcca;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.row p {
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #7e8798;
+  margin-top: 3px;
+  max-width: 92%;
+}
+.home-bar {
+  position: absolute;
+  left: 50%;
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  width: 118px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(40, 50, 70, 0.14);
+}
+
+/* ---------------------------------------------------------------- scrim */
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(246, 248, 251, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.scrim[data-on] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ------------------------------------------------------------- the goo
+   (the group's position/size live inline on the component — the library
+   writes its own inline `position: relative`, so a class can't win) */
+.lg-slot {
+  position: absolute;
+}
+.main-slot {
+  left: 72px;
+  top: 78px;
+}
+.action-slot {
+  left: 78px;
+  top: 84px;
+}
+/* the observe-item wrapper is box-less, so the dot positions itself */
+.tether-dot {
+  position: absolute;
+  left: 90px;
+  top: 96px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transform: scale(0.001);
+  will-change: transform;
+  pointer-events: none;
+}
+.main-btn,
+.dot-btn {
+  position: relative;
+  border-radius: 50%;
+  background: transparent; /* the liquid below is the surface */
+  display: grid;
+  place-items: center;
+  color: #fff;
+  pointer-events: auto;
+}
+.main-btn {
+  width: 56px;
+  height: 56px;
+}
+.dot-btn {
+  width: 44px;
+  height: 44px;
+}
+.main-btn:focus-visible,
+.dot-btn:focus-visible {
+  outline: 2.5px solid rgba(78, 107, 232, 0.55);
+  outline-offset: 4px;
+}
+
+/* icons stay crisp — they live in the content layer, never filtered */
+.ic {
+  display: grid;
+  place-items: center;
+  grid-area: 1 / 1;
+}
+.main-btn .ic {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition:
+    transform 0.36s cubic-bezier(0.36, 1.6, 0.35, 1),
+    opacity 0.2s ease;
+}
+.main-btn .plus.turned {
+  transform: rotate(135deg);
+}
+.main-btn .plus.out {
+  opacity: 0;
+  transform: rotate(135deg) scale(0.4);
+}
+.main-btn .swap {
+  opacity: 0;
+  transform: scale(0.3) rotate(-50deg);
+  pointer-events: none;
+  transition:
+    transform 0.3s ease,
+    opacity 0.14s ease;
+}
+.main-btn .swap.in {
+  opacity: 1;
+  transform: none;
+  transition:
+    transform 0.4s cubic-bezier(0.3, 1.7, 0.35, 1),
+    opacity 0.16s ease;
+}
+
+/* action icons materialise as their blob pulls free (delay set inline) */
+.dot-btn .ic {
+  opacity: 0;
+  transform: scale(0.3) rotate(-40deg);
+  transition:
+    opacity 0.13s ease,
+    transform 0.24s ease;
+  transition-delay: inherit;
+}
+.fab-goo[data-open] .dot-btn .ic {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.34s cubic-bezier(0.34, 1.6, 0.4, 1);
+  transition-delay: inherit;
+}
+/* the chosen one keeps its face while it pops… */
+.dot-btn.keep .ic {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0ms;
+}
+/* …then sinks into the main blob, fading right at the handoff */
+.dot-btn.keep.absorb .ic {
+  opacity: 0;
+  transform: scale(0.55);
+  transition:
+    opacity 0.2s ease 0.18s,
+    transform 0.32s ease 0.1s;
+}
+
+/* ---------------------------------------------------------------- toast */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 18px) scale(0.9);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 6px 14px 6px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #232935;
+  box-shadow:
+    0 8px 22px rgba(50, 70, 120, 0.13),
+    0 2px 6px rgba(50, 70, 120, 0.07);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.24s ease;
+}
+.toast[data-on] {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition:
+    opacity 0.2s ease,
+    transform 0.44s cubic-bezier(0.3, 1.6, 0.36, 1);
+}
+.toast-ic {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #4e6be8;
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+.toast-ic svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ------------------------------------------------------------------ site
+   A component-library docs page: sticky top bar, left sidebar of components,
+   main column with Preview/Code tabs over a big stage. Cinematic graphite —
+   near-black ground, monochrome objects, machined edge light. */
+.site {
+  height: 100dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #0a0a0c;
+  color: #f2f2f5;
+}
+
+/* top bar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 26px;
+  background: rgba(10, 10, 12, 0.86);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 9px;
+  font-family: 'Baloo 2', 'Quicksand', ui-rounded, system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f2f2f5;
+  text-decoration: none;
+}
+.brand svg {
+  margin-top: 2px;
+}
+.brand.dim {
+  color: rgba(255, 255, 255, 0.5);
+}
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topnav a {
+  padding: 6px 11px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  border-radius: 9px;
+  transition: color 0.2s ease;
+}
+.topnav a:hover {
+  color: #fff;
+}
+.pill {
+  padding: 6px 13px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+.pill.on {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+/* shell: sidebar + doc column */
+.shell {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  gap: 34px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 30px 26px 0;
+}
+.sidebar {
+  position: sticky;
+  top: 78px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 40px;
+}
+.side-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 18px 0 8px 12px;
+}
+.side-label:first-child {
+  margin-top: 4px;
+}
+.side-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.56);
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+.side-item:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.035);
+}
+.side-item.on {
+  background: rgba(255, 255, 255, 0.075);
+  color: #fff;
+}
+.side-ic,
+.intro-ic {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  flex: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+.side-item.on .side-ic {
+  background: rgba(255, 255, 255, 0.13);
+  color: #fff;
+}
+
+/* the doc column */
+.doc {
+  min-width: 0;
+  padding-bottom: 10px;
+}
+.doc-head {
+  max-width: 720px;
+}
+.doc-chip {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 18px;
+}
+.doc h1 {
+  font-family: 'Baloo 2', 'Quicksand', ui-rounded, system-ui, sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: #f4f4f7;
+}
+.doc-blurb {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* toolbar: tabs + copy */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 26px 0 14px;
+  flex-wrap: wrap;
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+.ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+.ghost-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.install {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 16px;
+  border-radius: 11px;
+  background: #121216;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+.install-d {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* the preview stage */
+.stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 420px;
+  border-radius: 22px;
+  background: radial-gradient(70% 60% at 50% 42%, #141418 0%, #101013 55%, #0d0d10 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.variants {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.vpill {
+  padding: 5px 11px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.48);
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+.vpill:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+.vpill.on {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.stage-hint {
+  position: absolute;
+  left: 20px;
+  bottom: 16px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.24);
+}
+
+/* code block */
+.code {
+  border-radius: 22px;
+  background: #0e0e11;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 22px 24px;
+  min-height: 420px;
+  overflow-x: auto;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12.8px;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.55);
+}
+.t-tag {
+  color: #f2f2f5;
+}
+.t-str {
+  color: rgba(255, 255, 255, 0.78);
+}
+.t-kw {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+.t-com {
+  color: rgba(255, 255, 255, 0.28);
+  font-style: italic;
+}
+
+/* "more in the set" + intro grid */
+.more-label {
+  margin: 34px 0 10px 2px;
+}
+.more-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+/* five across, so no card is left stranded on a row of its own */
+.intro-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 26px;
+}
+.more-card,
+.intro-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px 12px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.68);
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+.more-card:hover,
+.intro-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+.intro-card {
+  justify-content: flex-start;
+  min-width: 0;
+}
+.intro-go {
+  display: none;
+}
+
+/* footer */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 34px;
+  margin-top: 68px;
+  padding: 30px 0 54px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.foot-brand p {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+}
+.foot-cols {
+  display: flex;
+  gap: 60px;
+}
+.foot-cols .side-label {
+  margin: 0 0 10px;
+}
+.foot-link {
+  display: block;
+  padding: 3px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+.foot-link:hover {
+  color: #fff;
+}
+
+/* the FAB needs a fixed stage; it positions its blobs absolutely */
+.fab-room {
+  position: relative;
+  width: 200px;
+  height: 148px;
+}
+
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding-top: 16px;
+  }
+  .sidebar {
+    position: static;
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 14px;
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar {
+    display: none;
+  }
+  .sidebar .side-label {
+    display: none;
+  }
+  .side-item {
+    width: auto;
+    flex: none;
+    padding: 8px 14px 8px 8px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .doc h1 {
+    font-size: 34px;
+  }
+  .stage,
+  .code {
+    min-height: 360px;
+  }
+  .foot-cols {
+    gap: 40px;
+  }
+  .intro-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .topbar {
+    padding: 12px 18px;
+  }
+  /* the sidebar strip already lists the components */
+  .topnav .pill.on {
+    display: none;
+  }
+  .topnav {
+    gap: 2px;
+  }
+  .topnav a {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+}
+
+/* dock — the floating capsule; the active bubble is the goo */
+.dock {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 6px;
+  border-radius: 999px;
+  background: #141417;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.65),
+    0 4px 14px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.06);
+}
+.dock-btn {
+  position: relative;
+  z-index: 1;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.48);
+  transition: color 0.25s ease;
+}
+.dock-btn.on {
+  color: #fff;
+  transition: color 0.2s ease 0.12s;
+}
+.dock.row {
+  flex-direction: row;
+}
+.dock-bubble {
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  transition: transform 0.5s cubic-bezier(0.32, 1.2, 0.36, 1);
+}
+
+/* search — a round button that pours open into a field */
+.search [data-gooey-svg] > g {
+  transition: fill 0.32s ease;
+}
+.search {
+  position: relative;
+  width: 320px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+}
+.search-body {
+  display: flex;
+  align-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 26px;
+  overflow: hidden;
+  transition: width 0.42s cubic-bezier(0.34, 1.12, 0.36, 1);
+}
+.search-body.open {
+  width: 300px;
+}
+.search-ic {
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  color: rgba(255, 255, 255, 0.72);
+  transition: color 0.2s ease;
+}
+.search-body.open .search-ic {
+  color: #fff;
+}
+.search-input {
+  pointer-events: auto;
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  padding-right: 18px;
+  border: 0;
+  background: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #f2f2f5;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+.search-body.open .search-input {
+  opacity: 1;
+  transition: opacity 0.22s ease 0.16s;
+}
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.32);
+}
+
+/* submit — the liquid contracts inside a footprint that never changes, so
+   nothing beside it reflows */
+.submit-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.submit-wrap {
+  position: relative;
+  width: 208px; /* reserved for good — only the skin below resizes */
+  height: 52px;
+}
+.submit-skin {
+  width: 208px;
+  height: 52px;
+  border-radius: 26px;
+  transition: width 0.44s cubic-bezier(0.34, 1.1, 0.36, 1);
+}
+.submit-skin.loading {
+  width: 52px;
+}
+.submit-skin.done {
+  width: 148px;
+}
+.submit {
+  pointer-events: auto;
+  position: absolute;
+  inset: 0;
+  border-radius: 26px;
+  color: #17171a;
+}
+.submit-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: 14.5px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.09s ease;
+}
+.submit.idle .submit-face.idle,
+.submit.loading .submit-face.loading,
+.submit.done .submit-face.done {
+  opacity: 1;
+  transition: opacity 0.18s ease 0.1s;
+}
+.submit-ghost {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.34);
+}
+.submit-spin {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2.4px solid rgba(23, 23, 26, 0.22);
+  border-top-color: #17171a;
+  animation: submit-spin 0.72s linear infinite;
+}
+@keyframes submit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* slider — draggable droplet */
+.slider-demo {
+  position: relative;
+  width: 280px;
+  height: 44px;
+  touch-action: none;
+  cursor: pointer;
+}
+.slider-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 19px;
+  height: 6px;
+  border-radius: 3px;
+  background: #1b1b1f;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.slider-fill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+  background: #33333b;
+}
+.slider-thumb {
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: transform 0.45s cubic-bezier(0.3, 1.2, 0.36, 1);
+}
+.slider-demo.dragging .slider-thumb {
+  transition: transform 0.06s linear;
+}
+
+/* toggle — rubber snap */
+.toggle {
+  position: relative;
+  width: 96px;
+  height: 52px;
+  border-radius: 999px;
+  background: #151518;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55);
+  transition: background 0.3s ease;
+}
+.toggle.on {
+  background: #1f1f25;
+}
+.toggle-knob {
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  transition: transform 0.42s cubic-bezier(0.32, 1.35, 0.4, 1);
+}
+
+/* spinner — blobs on one ring, fused by the goo into a rotating comma */
+.spin-stage {
+  position: relative;
+  width: 132px;
+  height: 132px;
+}
+.spin-dot {
+  position: absolute;
+  left: calc(50% - 12px);
+  top: calc(50% - 12px);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+/* loader — one body, three floats */
+.loader-stage {
+  position: relative;
+  width: 170px;
+  height: 110px;
+}
+.loader-body {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  will-change: transform;
+}
+.bounce-dot {
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+}
+
+/* ------------------------------------------------------- reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .main-btn .ic,
+  .dot-btn .ic,
+  .toast,
+  .scrim {
+    transition-duration: 0.01s !important;
+    transition-delay: 0ms !important;
+  }
+}
+
+/* ------------------------------------------------------------ glass */
+/* The glass set (glasskit.jsx) — rigid Liquid Glass lenses over a generated
+   wallpaper. <Glass> renders: an svg holding its own refraction filter, a
+   lens span carrying backdrop-filter, a shade span carrying the specular
+   border-image, and the body. */
+.gl {
+  position: relative;
+  display: block;
+  /* depth without a card: one soft, low contact shadow */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+.gl-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.gl-lens {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.gl-body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+}
+button.gl {
+  cursor: pointer;
+}
+
+.site.glass .stage {
+  background: #5b5cf0;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+/* faint lines drifting under the components, so something is always passing
+   through the glass */
+.stage-drift {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -20%;
+  width: 140%;
+  background: repeating-linear-gradient(90deg, transparent 0 58px, rgba(255, 255, 255, 0.075) 58px 66px);
+  background-size: 66px 100%;
+  transform: skewX(-14deg);
+  animation: stage-drift 6s linear infinite;
+  pointer-events: none;
+}
+@keyframes stage-drift {
+  to {
+    background-position: 66px 0;
+  }
+}
+
+/* the material lab */
+.lab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 470px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0c0e22;
+}
+.lab-bg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(100% + 430px);
+  background: repeating-linear-gradient(
+    100deg,
+    #2b5cff 0 84px,
+    #22d3ee 84px 168px,
+    #8b5cf6 168px 252px,
+    #ff4fa3 252px 336px,
+    #ff8a3d 336px 420px
+  );
+  animation: lab-drift 18s linear infinite;
+}
+@keyframes lab-drift {
+  to {
+    transform: translateX(-426.47px);
+  }
+}
+.lab-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Baloo 2', 'Quicksand', ui-rounded, system-ui, sans-serif;
+  font-size: 128px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.92);
+  pointer-events: none;
+}
+.lab-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+.lab-disc {
+  width: 124px;
+  height: 124px;
+}
+.lab-pill {
+  width: 300px;
+  height: 88px;
+}
+.lab-card {
+  width: 190px;
+  height: 132px;
+}
+.lab-label {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.site.glass .vpill.on,
+.site.glass .stage-hint {
+  color: #fff;
+}
+.site.glass .variants {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(16px);
+}
+.site.glass .vpill {
+  color: rgba(255, 255, 255, 0.6);
+}
+.site.glass .vpill.on {
+  background: rgba(255, 255, 255, 0.18);
+}
+.site.glass .stage-hint {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* menu */
+.gm-action,
+.gm-main {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  will-change: transform;
+}
+.gm-main {
+  width: 56px;
+  height: 56px;
+}
+.gm-action {
+  opacity: 0;
+  pointer-events: none;
+}
+.gm-action.out {
+  opacity: 1;
+  pointer-events: auto;
+}
+.gm-plus,
+.gm-swap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition:
+    transform 0.36s cubic-bezier(0.36, 1.6, 0.35, 1),
+    opacity 0.2s ease;
+}
+.gm-plus.turned {
+  transform: rotate(135deg);
+}
+.gm-plus.out {
+  opacity: 0;
+  transform: rotate(135deg) scale(0.4);
+}
+.gm-swap {
+  opacity: 0;
+  transform: scale(0.3) rotate(-50deg);
+}
+.gm-swap.in {
+  opacity: 1;
+  transform: none;
+  transition:
+    transform 0.4s cubic-bezier(0.3, 1.7, 0.35, 1),
+    opacity 0.16s ease;
+}
+
+/* dock */
+.glass-dock {
+  display: block;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+}
+.glass-dock > .gl-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 6px;
+  width: auto;
+  height: auto;
+}
+.glass-dock.row > .gl-body {
+  flex-direction: row;
+}
+.gd-bubble {
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  width: 52px;
+  height: 52px;
+  will-change: transform;
+}
+.site.glass .dock-btn {
+  color: rgba(255, 255, 255, 0.6);
+}
+.site.glass .dock-btn.on {
+  color: #fff;
+}
+
+/* slider */
+.glass-slider .slider-track {
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+}
+.glass-slider .slider-fill {
+  background: rgba(255, 255, 255, 0.72);
+}
+.gs-thumb {
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 30px;
+  height: 30px;
+  will-change: transform;
+}
+
+/* toggle */
+.glass-toggle,
+.glass-toggle.on {
+  background: none;
+  border: 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+  transition: none;
+}
+.gt-knob {
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  width: 38px;
+  height: 38px;
+  will-change: transform;
+}
+
+/* search */
+.gsearch {
+  width: 52px;
+  height: 52px;
+  transition: width 0.5s cubic-bezier(0.34, 1.12, 0.36, 1);
+}
+.gsearch.open {
+  width: 300px;
+}
+.gsearch > .gl-body {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.gsearch .search-input {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.gsearch.open .search-input {
+  opacity: 1;
+  transition: opacity 0.22s ease 0.18s;
+}
+.site.glass .search-input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* submit */
+.gsubmit {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 208px;
+  height: 52px;
+  transform: translateX(-50%);
+  transition: width 0.5s cubic-bezier(0.34, 1.1, 0.36, 1);
+  color: #fff;
+}
+.gsubmit.loading {
+  width: 52px;
+}
+.gsubmit.done {
+  width: 148px;
+}
+.gsubmit .submit-face {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.gsubmit .submit-spin {
+  border-color: rgba(255, 255, 255, 0.28);
+  border-top-color: #fff;
+}
+.site.glass .submit-ghost {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* spinner + loader beads */
+.gsp-bead,
+.gld-bead {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  will-change: transform;
+}
+.gld-bead {
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+}
+.gsp-bead .gl,
+.gld-bead .gl {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+}
+
+/* material switch in the top bar */
+.seg {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  margin-right: 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.seg-btn {
+  padding: 4px 11px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+.seg-btn:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+.seg-btn.on {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
