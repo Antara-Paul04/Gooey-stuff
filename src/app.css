@@ -1931,7 +1931,10 @@ button.gl {
   padding: 6px 10px;
 }
 .ck-loader .ck-led.big.ring {
-  position: static;
+  /* stays positioned: the glow pseudo-element is absolute inside it */
+  position: relative;
+  left: auto;
+  top: auto;
   margin: 0;
 }
 .ck-loader .ck-led::after {
