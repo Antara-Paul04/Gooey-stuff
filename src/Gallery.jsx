@@ -11,6 +11,16 @@ import {
 } from './demos.jsx'
 import { BounceLoader, SpinnerDemo } from './loaders.jsx'
 import { LensLab } from './lens.jsx'
+import {
+  ConsoleDock,
+  ConsoleLoader,
+  ConsoleMenu,
+  ConsoleSearch,
+  ConsoleSlider,
+  ConsoleSpinner,
+  ConsoleSubmit,
+  ConsoleToggle,
+} from './consolekit.jsx'
 import { blueprintURL } from './glass.jsx'
 import {
   GlassDock,
@@ -132,6 +142,27 @@ const DOCS = [
 // and a specular rim lit from the top-left`,
     render: () => <MenuDemo />,
     glass: () => <GlassMenu />,
+    console: () => <ConsoleMenu />,
+    consoleBlurb:
+      'A round key that fans three square keys out from behind it, each lighting up as it lands; press one and it takes.',
+    consoleHint: 'Press the key',
+    consoleCode: `<Key className="main" onClick={toggle}>+</Key>
+
+{ACTIONS.map((a, i) => (
+  <Key
+    key={a.id}
+    lit={open}
+    style={{
+      transform: open ? \`translate(\${FAN[i].x}px, \${FAN[i].y}px)\` : 'scale(.6)',
+      transition: \`transform .8s \${spring(260, 18)} \${i * 60}ms\`,
+    }}
+  >
+    {a.icon}
+  </Key>
+))}
+
+// a key is a matte block with a top highlight and a dark bottom edge;
+// lit backlights it electric blue, glow bleeding past the edges`,
     hint: 'Tap the button',
     code: `import { Liquid } from 'liquid-gooey'
 
@@ -180,6 +211,19 @@ const DOCS = [
 // frost = backdrop blur inside the glass`,
     render: (v) => <DockDemo key={v} variant={v} />,
     glass: (v) => <GlassDock key={v} variant={v} />,
+    console: (v) => <ConsoleDock key={v} variant={v} />,
+    consoleBlurb:
+      'A key strip on a slab. One backlit cap slides under the keys to whichever you press, and the key it lands on lights up white.',
+    consoleHint: 'Press any key',
+    consoleCode: `<div className="strip">
+  <div
+    className="litcap"
+    style={{ transform: \`translateY(\${active * 64}px)\`, transition: \`transform .8s \${spring(260, 18)}\` }}
+  />
+  {ICONS.map((it, i) => (
+    <Key key={it.id} className={i === active ? 'on' : ''} onClick={() => setActive(i)}>{it.icon}</Key>
+  ))}
+</div>`,
     variants: [
       { id: 'vertical', name: 'Rail' },
       { id: 'horizontal', name: 'Bar' },
@@ -217,6 +261,16 @@ const DOCS = [
 // thickness = the slab height; thicker glass bends the backdrop further`,
     render: (v) => <SliderDemo key={v} variant={v} />,
     glass: (v) => <GlassSlider key={v} variant={v} />,
+    console: (v) => <ConsoleSlider key={v} variant={v} />,
+    consoleBlurb:
+      'A fader: a cap in a recessed slot, and a row of LEDs underneath that light up to the level.',
+    consoleHint: 'Drag the cap',
+    consoleCode: `<div className="slot" />
+<div className="cap" style={{ transform: \`translateX(\${value * SPAN}px)\` }} />
+
+<div className="leds">
+  {leds.map((_, i) => <LED key={i} on={(i + .5) / N <= value} />)}
+</div>`,
     variants: [
       { id: 'single', name: 'Single' },
       { id: 'range', name: 'Range' },
@@ -261,6 +315,18 @@ const DOCS = [
 </Glass>`,
     render: () => <ToggleDemo />,
     glass: () => <GlassToggle />,
+    console: () => <ConsoleToggle />,
+    consoleBlurb:
+      'A slide switch: a cap in a slot, an indicator line in the cap that lights when it is on, and an LED beside the label.',
+    consoleHint: 'Flip it',
+    consoleCode: `<button className={on ? 'switch on' : 'switch'} onClick={() => setOn(!on)}>
+  <span className="slot">
+    <span className="cap" style={{ transform: \`translateX(\${on ? 46 : 0}px)\` }}>
+      <span className="line" />
+    </span>
+  </span>
+</button>
+<LED on={on} /> {on ? 'ON' : 'OFF'}`,
     hint: 'Tap to switch',
     code: `<Liquid blur={7} contrast={26} fill="#EDEDF1" shadow={SHADOW}>
   <Liquid.Item
@@ -290,6 +356,17 @@ const DOCS = [
 // the map is 9-sliced (corners + stretched edges), so any width works`,
     render: () => <SearchDemo />,
     glass: () => <GlassSearch />,
+    console: () => <ConsoleSearch />,
+    consoleBlurb:
+      'A search key that lights up and slides an LCD strip out beside it; the text glows the same blue.',
+    consoleHint: 'Press the key',
+    consoleCode: `<Key lit={open} onClick={() => setOpen(!open)}>{searchIcon}</Key>
+<div className="display">
+  <input placeholder="SEARCH COMPONENTS" />
+</div>
+
+.display      { width: 0; transition: width .5s }
+.open .display { width: 244px }`,
     hint: 'Tap the icon',
     code: `<Liquid blur={9} contrast={27} fill="#2C2C33" shadow={SHADOW}>
   <Liquid.Item morph={{ shape: true, bounce: 0.55, contentBlur: 5 }}>
@@ -325,6 +402,15 @@ const DOCS = [
 .submit.done    { width: 148px }`,
     render: () => <SubmitDemo />,
     glass: () => <GlassSubmit />,
+    console: () => <ConsoleSubmit />,
+    consoleBlurb:
+      'A wide key. Press it and it sinks while a LED blinks WORKING, then it lights up DONE — the footprint never changes, so the Cancel key beside it never moves.',
+    consoleHint: 'Press the key',
+    consoleCode: `<Key lit={state === 'done'} pressed={state === 'loading'} onClick={go}>
+  {state === 'idle' && 'Create account'}
+  {state === 'loading' && <><LED on blink /> Working</>}
+  {state === 'done' && 'Done'}
+</Key>`,
     hint: 'Tap to submit',
     code: `{/* the wrapper reserves the space; only the skin inside it resizes */}
 <div className="wrap">
@@ -369,6 +455,16 @@ const a = t * 2.3 - i * STEP
 el.style.transform = \`translate(\${Math.cos(a) * R}px, \${Math.sin(a) * R}px)\``,
     render: (v) => <SpinnerDemo key={v} variant={v} />,
     glass: (v) => <GlassSpinner key={v} variant={v} />,
+    console: (v) => <ConsoleSpinner key={v} variant={v} />,
+    consoleBlurb:
+      "A ring of LEDs chasing around a knob — a head that lights each one in turn with a trail fading behind it — while the knob's tick follows. Trail length and arm count make the variants.",
+    consoleHint: 'Runs on its own',
+    consoleCode: `// each frame: how far behind the head is LED i?
+const behind = (head - i + N) % N
+led.style.setProperty('--a', behind < TRAIL ? 1 - behind / TRAIL : 0)
+knob.style.transform = \`rotate(\${(head / N) * 360}deg)\`
+
+.led::after { opacity: var(--a); background: #5b6dff; box-shadow: 0 0 14px 4px rgba(59,91,255,.5) }`,
     variants: [
       { id: 'comet', name: 'Comet' },
       { id: 'arc', name: 'Arc' },
@@ -410,6 +506,13 @@ el.style.transform =
 const y = -Math.sin(w * t - i * 0.82) * 22`,
     render: () => <BounceLoader fill={GRAPHITE_HI} shadow={DARK_SHADOW_SM} />,
     glass: () => <GlassLoader />,
+    console: () => <ConsoleLoader />,
+    consoleBlurb:
+      'Three LEDs breathing in sequence — each brightening as the one before it fades.',
+    consoleHint: 'Runs on its own',
+    consoleCode: `// one sine, phase-shifted per LED
+const a = 0.5 + 0.5 * Math.sin(t * 4.2 - i * 0.82)
+led.style.setProperty('--a', a)`,
     hint: 'Plays on its own',
     code: `<Liquid blur={8} contrast={26} fill="#2C2C33" shadow={SHADOW}>
   {[0, 1, 2].map((i) => (
@@ -515,9 +618,10 @@ function Intro({ onPick }) {
         </span>
         <h1>Jelly UI</h1>
         <p className="doc-blurb">
-          Eight components in two materials. Gooey: soft bodies built on the Gooey library, where every state change
-          is liquid — pieces stretch, tear, trail and merge. Glass: the same eight as Liquid Glass, rigid lenses that
-          refract whatever sits behind them. Flip between them with the switch up top.
+          Eight components in three materials. Gooey: soft bodies built on the Gooey library, where every state
+          change is liquid. Glass: the same eight as Liquid Glass, clear lenses that bend whatever sits behind them.
+          Console: the same eight as hardware — keys cut into a matte slab, with one blue backlight. Flip between
+          them with the switch up top.
         </p>
       </div>
 
@@ -544,12 +648,14 @@ export default function Gallery() {
   const [active, setActive] = useState('menu')
   const [tab, setTab] = useState('preview')
   const [variant, setVariant] = useState({})
-  const [material, setMaterial] = useState(() =>
-    new URLSearchParams(location.search).has('glass') ? 'glass' : 'gooey',
-  )
+  const [material, setMaterial] = useState(() => {
+    const q = new URLSearchParams(location.search)
+    return q.has('glass') ? 'glass' : q.has('console') ? 'console' : 'gooey'
+  })
   const doc = DOCS.find((d) => d.id === active)
   const current = doc?.variants ? (variant[doc.id] ?? doc.variants[0].id) : undefined
   const glass = material === 'glass'
+  const konsole = material === 'console'
   if (!glass && active === 'lab') setActive('intro')
 
   const pick = (id) => {
@@ -559,7 +665,7 @@ export default function Gallery() {
   }
 
   return (
-    <div className={`site${glass ? ' glass' : ''}`}>
+    <div className={`site${glass ? ' glass' : ''}${konsole ? ' console' : ''}`}>
       <header className="topbar">
         <button className="brand" onClick={() => pick('intro')}>
           <Glyph />
@@ -567,22 +673,21 @@ export default function Gallery() {
         </button>
         <nav className="topnav">
           <div className="seg" role="radiogroup" aria-label="Material">
-            <button
-              role="radio"
-              aria-checked={!glass}
-              className={`seg-btn${!glass ? ' on' : ''}`}
-              onClick={() => setMaterial('gooey')}
-            >
-              Gooey
-            </button>
-            <button
-              role="radio"
-              aria-checked={glass}
-              className={`seg-btn${glass ? ' on' : ''}`}
-              onClick={() => setMaterial('glass')}
-            >
-              Glass
-            </button>
+            {[
+              ['gooey', 'Gooey'],
+              ['glass', 'Glass'],
+              ['console', 'Console'],
+            ].map(([id, name]) => (
+              <button
+                key={id}
+                role="radio"
+                aria-checked={material === id}
+                className={`seg-btn${material === id ? ' on' : ''}`}
+                onClick={() => setMaterial(id)}
+              >
+                {name}
+              </button>
+            ))}
           </div>
           <span className="pill on">Components</span>
           <a href="https://libraries.dev/gooey" target="_blank" rel="noreferrer">
@@ -638,7 +743,7 @@ export default function Gallery() {
               <div className="doc-head">
                 <span className="doc-chip">{NavIcon[doc.id]}</span>
                 <h1>{doc.name}</h1>
-                <p className="doc-blurb">{glass ? doc.glassBlurb : doc.blurb}</p>
+                <p className="doc-blurb">{glass ? doc.glassBlurb : konsole ? doc.consoleBlurb : doc.blurb}</p>
               </div>
 
               <div className="toolbar">
@@ -650,12 +755,12 @@ export default function Gallery() {
                     Code
                   </button>
                 </div>
-                <CopyButton text={glass ? doc.glassCode : doc.code} />
+                <CopyButton text={glass ? doc.glassCode : konsole ? doc.consoleCode : doc.code} />
               </div>
 
               {tab === 'preview' ? (
                 <Stage glass={glass}>
-                  {glass ? doc.glass(current) : doc.render(current)}
+                  {glass ? doc.glass(current) : konsole ? doc.console(current) : doc.render(current)}
                   {doc.variants && (
                     <div className="variants">
                       {doc.variants.map((v) => (
@@ -669,10 +774,10 @@ export default function Gallery() {
                       ))}
                     </div>
                   )}
-                  <span className="stage-hint">{glass ? doc.glassHint : doc.hint}</span>
+                  <span className="stage-hint">{glass ? doc.glassHint : konsole ? doc.consoleHint : doc.hint}</span>
                 </Stage>
               ) : (
-                <Code source={glass ? doc.glassCode : doc.code} />
+                <Code source={glass ? doc.glassCode : konsole ? doc.consoleCode : doc.code} />
               )}
 
               <p className="side-label more-label">More in the set</p>

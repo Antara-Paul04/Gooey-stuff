@@ -1479,3 +1479,463 @@ button.gl {
   color: rgba(255, 255, 255, 0.9);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
+
+/* ------------------------------------------------------------ console */
+/* The hardware set (consolekit.jsx): a matte slab, keys cut into it with
+   narrow dark gaps, monospace labels, one blue backlight. */
+.site.console .stage {
+  background: #0b0c10;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+.ck-plate {
+  position: relative;
+  padding: 16px;
+  border-radius: 34px;
+  background: #121317;
+  /* the slab: a lighter top face, the thick side below it, a pool of shadow */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 16px 0 #08090c,
+    0 18px 0 rgba(255, 255, 255, 0.025),
+    0 40px 80px rgba(0, 0, 0, 0.75),
+    0 20px 30px rgba(0, 0, 0, 0.5);
+}
+.ck-key {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: #17181d;
+  color: #c9ccd3;
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.065),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.42),
+    0 2px 0 rgba(0, 0, 0, 0.55);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.3s ease,
+    color 0.3s ease;
+}
+.ck-key:active,
+.ck-key.pressed {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+    0 0 0 rgba(0, 0, 0, 0.55);
+}
+.ck-key.lit {
+  background: radial-gradient(120% 110% at 50% 115%, #5b6dff 0%, #3143f2 38%, #1c2bb4 100%);
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.25),
+    0 0 0 1.5px rgba(96, 120, 255, 0.85),
+    0 0 26px 6px rgba(59, 91, 255, 0.45);
+}
+.ck-key-face {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  grid-auto-flow: column;
+}
+.ck-key svg {
+  display: block;
+}
+.ck-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #9ea3ad;
+}
+
+/* LEDs */
+.ck-led {
+  --a: 0;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1f2027;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+.ck-led::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #5b6dff;
+  box-shadow:
+    0 0 6px 1px rgba(91, 109, 255, 0.9),
+    0 0 14px 4px rgba(59, 91, 255, 0.5);
+  opacity: var(--a);
+  transition: opacity 0.25s ease;
+}
+.ck-led.on {
+  --a: 1;
+}
+.ck-led.ring::after {
+  transition: none;
+}
+.ck-led.big {
+  width: 12px;
+  height: 12px;
+}
+.ck-led.blink::after {
+  animation: ck-blink 0.8s steps(2, end) infinite;
+}
+@keyframes ck-blink {
+  to {
+    opacity: 0.25;
+  }
+}
+
+/* menu: a round key and three square keys that come out lit */
+.ck-menu .fab-room {
+  width: 200px;
+  height: 148px;
+}
+.ck-main,
+.ck-action {
+  position: absolute;
+  will-change: transform;
+}
+.ck-main {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  z-index: 1;
+}
+.ck-action {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  opacity: 0;
+  pointer-events: none;
+}
+.ck-action.out {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* dock: a key strip with one lit cap sliding under the keys */
+.ck-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+.ck-dock.row {
+  flex-direction: row;
+}
+.ck-dockkey {
+  position: relative;
+  z-index: 1;
+  width: 56px;
+  height: 56px;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(201, 204, 211, 0.55);
+}
+.ck-dockkey::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #17181d;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.065),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.42),
+    0 2px 0 rgba(0, 0, 0, 0.55);
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+.ck-dockkey.on {
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+.ck-dockkey.on::before {
+  opacity: 0;
+}
+.ck-dockkey:active {
+  transform: none;
+  box-shadow: none;
+}
+.ck-litcap {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 20px;
+  background: radial-gradient(120% 110% at 50% 115%, #5b6dff 0%, #3143f2 38%, #1c2bb4 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.25),
+    0 0 0 1.5px rgba(96, 120, 255, 0.85),
+    0 0 26px 6px rgba(59, 91, 255, 0.45);
+  will-change: transform;
+}
+
+/* fader */
+.ck-fader {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 24px 18px;
+}
+.ck-fader-track {
+  position: relative;
+  width: 280px;
+  height: 54px;
+  touch-action: none;
+  cursor: pointer;
+}
+.ck-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 22px;
+  height: 10px;
+  border-radius: 5px;
+  background: #07080b;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.ck-cap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 54px;
+  border-radius: 9px;
+  background: linear-gradient(#26272f, #191a20);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 4px 0 #08090c,
+    0 10px 18px rgba(0, 0, 0, 0.6);
+  display: grid;
+  place-items: center;
+  will-change: transform;
+}
+.ck-cap-line {
+  width: 3px;
+  height: 18px;
+  border-radius: 2px;
+  background: #5b6dff;
+  box-shadow: 0 0 8px 1px rgba(91, 109, 255, 0.85);
+}
+.ck-leds {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 14px;
+}
+
+/* switch */
+.ck-switch-plate {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px 18px 18px;
+}
+.ck-switch {
+  display: block;
+}
+.ck-switch-slot {
+  display: block;
+  position: relative;
+  width: 100px;
+  height: 44px;
+  border-radius: 12px;
+  background: #07080b;
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.ck-switch-cap {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 46px;
+  height: 36px;
+  border-radius: 9px;
+  background: linear-gradient(#26272f, #191a20);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 3px 0 #08090c,
+    0 8px 14px rgba(0, 0, 0, 0.6);
+  display: grid;
+  place-items: center;
+  will-change: transform;
+}
+.ck-switch-cap .ck-cap-line {
+  opacity: 0.25;
+  box-shadow: none;
+  transition:
+    opacity 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.ck-switch.on .ck-switch-cap .ck-cap-line {
+  opacity: 1;
+  box-shadow: 0 0 8px 1px rgba(91, 109, 255, 0.85);
+}
+
+/* search: a key and an LCD strip that slides out */
+.ck-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+.ck-searchkey {
+  width: 56px;
+  height: 56px;
+  flex: none;
+}
+.ck-display {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 0;
+  height: 56px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #07080b;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.9),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+  transition: width 0.5s cubic-bezier(0.34, 1.12, 0.36, 1);
+}
+.ck-search.open .ck-display {
+  width: 244px;
+}
+.ck-display-input {
+  pointer-events: auto;
+  width: 100%;
+  height: 100%;
+  padding: 0 18px;
+  border: 0;
+  background: none;
+  outline: none;
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a9bff;
+  text-shadow: 0 0 10px rgba(91, 109, 255, 0.7);
+}
+.ck-display-input::placeholder {
+  color: rgba(138, 155, 255, 0.4);
+  text-shadow: none;
+}
+
+/* submit */
+.ck-submit-plate {
+  padding: 16px;
+}
+.ck-submit-plate .submit-wrap {
+  width: 208px;
+  height: 56px;
+}
+.ck-submit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+.ck-submit .submit-face {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  gap: 10px;
+}
+.ck-submit.idle .submit-face.idle,
+.ck-submit.loading .submit-face.loading,
+.ck-submit.done .submit-face.done {
+  opacity: 1;
+  transition: opacity 0.18s ease 0.1s;
+}
+.ck-cancel {
+  width: 96px;
+  height: 56px;
+  margin-left: 4px;
+  color: rgba(201, 204, 211, 0.55);
+}
+
+/* spinner: an LED ring around a knob */
+.ck-spin-plate,
+.ck-loader-plate {
+  padding: 18px;
+}
+.ck-ring {
+  position: relative;
+  width: 132px;
+  height: 132px;
+}
+.ck-led.ring {
+  position: absolute;
+  margin: -4px 0 0 -4px;
+}
+.ck-knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #2a2b33, #16171c 72%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.5),
+    0 8px 0 #08090c,
+    0 18px 30px rgba(0, 0, 0, 0.7);
+  will-change: transform;
+}
+.ck-tick {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 3px;
+  height: 14px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: #5b6dff;
+  box-shadow: 0 0 8px 1px rgba(91, 109, 255, 0.85);
+}
+
+/* loader: three LEDs breathing in sequence */
+.ck-loader-plate {
+  padding: 26px 40px;
+}
+.ck-loader {
+  display: flex;
+  gap: 44px;
+  padding: 6px 10px;
+}
+.ck-loader .ck-led.big.ring {
+  position: static;
+  margin: 0;
+}
+.ck-loader .ck-led::after {
+  box-shadow:
+    0 0 6px 1px rgba(91, 109, 255, 0.9),
+    0 0 12px 3px rgba(59, 91, 255, 0.45);
+}

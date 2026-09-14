@@ -10,7 +10,7 @@ import { DOCK_ICONS, ICON_SEARCH } from './demos.jsx'
 
 /* a spring as a CSS easing — Chrome's linear() lets a real damped spring
    drive a transition */
-function spring(stiffness = 300, damping = 22, mass = 1, steps = 40) {
+export function spring(stiffness = 300, damping = 22, mass = 1, steps = 40) {
   const w0 = Math.sqrt(stiffness / mass)
   const z = damping / (2 * Math.sqrt(stiffness * mass))
   const wd = w0 * Math.sqrt(Math.max(0, 1 - z * z))

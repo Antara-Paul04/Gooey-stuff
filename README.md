@@ -1,9 +1,10 @@
 # Jelly UI
 
-Eight React components in two materials, on a small docs site built for screenshots and screen recordings.
+Eight React components in three materials, on a small docs site built for screenshots and screen recordings.
 
 - **Gooey** — soft bodies built on [`liquid-gooey`](https://www.npmjs.com/package/liquid-gooey). Every state change is liquid: pieces stretch, tear, trail and merge while the icons riding on top stay crisp.
-- **Glass** — the same eight as Liquid Glass. Rigid lenses that refract whatever is really behind them, with a specular that follows the cursor and a little gel give when you touch them.
+- **Glass** — the same eight as Liquid Glass. Clear lenses that bend whatever is really behind them at the rim, with a specular that follows the cursor.
+- **Console** — the same eight as hardware. Matte slabs with keys cut into them, monospace labels, faders, a slide switch, an LCD strip, LEDs — and one electric-blue backlight as the only colour (`src/consolekit.jsx`).
 
 Components: Menu, Dock (Rail / Bar), Slider (Single / Range), Toggle, Search, Submit, Spinner (Comet / Arc / Dual), Loader. In Glass, a photograph sits on the stage under the components — drag it through them to watch the material bend it. The Glass side also has a **Material** page: one lens that follows the cursor over a photograph, black type, hairlines and a gradient, for looking at the optics on their own.
 
