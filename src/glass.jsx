@@ -28,47 +28,27 @@ import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 're
 const DPR = typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio || 1) : 1
 const ETA = 1 / 1.5
 
-/* bezel height profiles, 0 at the edge → 1 at the inner end of the bezel */
+/* The bend across the bezel: full at the very edge, easing to nothing at the
+   inner end of the bezel (Apple's rim distorts most right at the boundary).
+   `power` shapes the fall-off. */
 const PROFILES = {
-  circle: (x) => (x >= 1 ? 1 : Math.sqrt(1 - (1 - x) * (1 - x))),
-  squircle: (x) => (x >= 1 ? 1 : Math.pow(1 - Math.pow(1 - x, 4), 0.25)),
-}
-
-const slopeAt = (f, x, b, T) => {
-  const e = 1e-3
-  return ((f(Math.min(1, x + e)) - f(Math.max(0, x - e))) / (2 * e)) * (T / b)
-}
-
-/* lateral shift (px, toward the interior) of the backdrop seen through the
-   bezel at fraction x of its width: refract the vertical ray at the surface,
-   then let it descend the glass under that point */
-function shiftAt(f, x, b, T) {
-  if (x >= 1) return 0
-  const h = f(x)
-  const slope = slopeAt(f, x, b, T)
-  const len = Math.hypot(slope, 1)
-  const nx = -slope / len
-  const nz = 1 / len
-  const c1 = nz
-  const c2 = Math.sqrt(Math.max(0, 1 - ETA * ETA * (1 - c1 * c1)))
-  const k = ETA * c1 - c2
-  const tx = k * nx
-  const tz = -ETA + k * nz
-  return (h * T * tx) / -tz
+  circle: (x) => Math.pow(Math.max(0, 1 - x), 1.6),
+  squircle: (x) => Math.pow(Math.max(0, 1 - x), 2.2),
 }
 
 function shiftTable(f, b, T, n = 160) {
   const t = new Float32Array(n + 1)
   let max = 0
   for (let i = 0; i <= n; i++) {
-    t[i] = shiftAt(f, i / n, b, T)
+    t[i] = T * f(i / n)
     if (t[i] > max) max = t[i]
   }
   return { t, max, n }
 }
 
 const lookup = ({ t, n }, x) => {
-  if (x <= 0 || x >= 1) return 0
+  if (x <= 0) return t[0]
+  if (x >= 1) return 0
   const q = x * n
   const i = Math.floor(q)
   return t[i] + (t[i + 1] - t[i]) * (q - i)
@@ -100,9 +80,9 @@ function rbox(x, y, W, H, r) {
 const clamp255 = (v) => Math.max(0, Math.min(255, Math.round(v)))
 const cache = new Map()
 
-/* Tiles for one (radius, depth, thickness, profile). Each pixel packs the
-   displacement vector (R, G — 127.5 is zero) and the bezel height (B —
-   127.5 is zero, 255 is the flat top). Alpha stays opaque so nothing is
+/* Tiles for one (radius, depth, shift, profile). Each pixel packs the
+   displacement vector (R, G — 127.5 is zero) and the distance in from the
+   rim across the bezel (B — 127.5 is the edge, 255 the inner end). Alpha stays opaque so nothing is
    premultiplied away. */
 export function glassTiles(r, b, T, profileName) {
   const key = `${r}|${b}|${T}|${profileName}|${DPR}`
@@ -123,7 +103,7 @@ export function glassTiles(r, b, T, profileName) {
         const { d, gx, gy } = at((i + 0.5) / DPR, (j + 0.5) / DPR)
         const inside = d > 0
         const m = inside ? lookup(table, d / b) : 0
-        const h = inside ? f(Math.min(1, d / b)) : 0
+        const h = inside ? Math.min(1, d / b) : 0
         const o = (j * c.width + i) * 4
         px[o] = clamp255(127.5 + (127.5 * m * gx) / S)
         px[o + 1] = clamp255(127.5 + (127.5 * m * gy) / S)
@@ -241,11 +221,21 @@ const spring = (st, target, k, damp, dt) => {
 
 const DEFAULT_LIGHT = { azimuth: -118, elevation: 28, lean: 34 }
 
+/* R ← 0.5 + sign · (dx·Lx + dy·Ly): the map's bend vector dotted with the
+   light direction, so the rim lights up where it bends toward the light */
+function faceValues(azimuth, sign) {
+  const a = (azimuth * Math.PI) / 180
+  const lx = sign * Math.cos(a)
+  const ly = sign * Math.sin(a)
+  const c = 0.5 - 0.5 * (lx + ly)
+  return `${lx.toFixed(4)} ${ly.toFixed(4)} 0 0 ${c.toFixed(4)}  0 0 0 0 0  0 0 0 0 0  0 0 0 0 1`
+}
+
 /* -------------------------------------------------------------- <Glass> --
    radius     corner radius (a capsule / circle when it is half the height)
    depth      how far the bezel reaches in from the edge (Figma: Depth)
-   thickness  slab height — sets how hard the bezel bends light
-   profile    bezel curvature: 'circle' (broad lens) or 'squircle' (Apple's)
+   thickness  the bend at the very edge, in px
+   profile    how the bend eases inward: 'circle' (gentler) or 'squircle' (tighter)
    frost      optional backdrop blur (a layer, never the effect)
    dispersion per-channel stagger of the refraction
    flex       whether the cursor presses into the surface */
@@ -278,7 +268,7 @@ export function Glass({
   const lightRef = useRef([])
   const [size, setSize] = useState({ w: 0, h: 0 })
   const b = depth ?? Math.max(5, Math.round(radius * 0.38))
-  const T = thickness ?? Math.round(b * 2)
+  const T = thickness ?? Math.max(4, Math.round(b * 0.85))
   const lit = light ?? DEFAULT_LIGHT
   const g = useMemo(() => glassTiles(radius, b, T, profile), [radius, b, T, profile])
   const R = Math.round(radius * 1.7)
@@ -350,8 +340,8 @@ export function Glass({
           fn.setAttribute('intercept', (0.5 * (1 - k)).toFixed(4))
         }
         const [l1, l2] = lightRef.current
-        if (l1) l1.setAttribute('azimuth', st.az.x.toFixed(2))
-        if (l2) l2.setAttribute('azimuth', (st.az.x + 180).toFixed(2))
+        if (l1) l1.setAttribute('values', faceValues(st.az.x, -1))
+        if (l2) l2.setAttribute('values', faceValues(st.az.x, 1))
         const moving =
           kT > 0 || Math.abs(st.k.x) > 0.002 || Math.abs(st.k.v) > 0.01 || Math.abs(st.az.x - lit.azimuth) > 0.05 || Math.abs(st.az.v) > 0.05
         return moving
@@ -449,24 +439,35 @@ export function Glass({
               {/* 6 · translucent material: a breath of white and the ambient colour of the surroundings */}
               <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="amb" />
               <feComposite in="lens0" in2="amb" operator="arithmetic" k2={1 - tint - ambient} k3={ambient} k4={tint} result="lens1" />
-              {/* 7 · thickness: the bezel reflects the darker surroundings, then a thin bright line rides its very edge */}
+              {/* 7 · thickness: the rim holds a little less light than the top */}
               <feComposite in="lens1" in2="core" operator="arithmetic" k1="0.12" k2="0.88" result="lens2" />
-              <feComponentTransfer in="edge" result="edgeLine">
-                <feFuncR type="gamma" amplitude="0.45" exponent="7" offset="0" />
-                <feFuncG type="gamma" amplitude="0.45" exponent="7" offset="0" />
-                <feFuncB type="gamma" amplitude="0.45" exponent="7" offset="0" />
+              {/* 8 · the shine: a thin line riding the very edge, lit where the rim bends toward the
+                  light (top-left) with a fainter return along the opposite arc — read straight off
+                  the refraction map, so it follows the geometry and the cursor's lean */}
+              <feColorMatrix ref={(n) => (lightRef.current[0] = n)} in="field" type="matrix" values={faceValues(lit.azimuth, -1)} result="f1r" />
+              <feComponentTransfer in="f1r" result="f1">
+                <feFuncR type="linear" slope="2.4" intercept="-1.2" />
               </feComponentTransfer>
-              <feComposite in="lens2" in2="edgeLine" operator="arithmetic" k2="1" k3="1" result="lens2b" />
-              {/* 8 · specular: a key light and a faint return light on the bezel */}
-              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.4" specularExponent="64" lightingColor="#fff" result="sp1">
-                <feDistantLight ref={(n) => (lightRef.current[0] = n)} azimuth={lit.azimuth} elevation={lit.elevation} />
-              </feSpecularLighting>
-              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.2" specularExponent="44" lightingColor="#fff" result="sp2">
-                <feDistantLight ref={(n) => (lightRef.current[1] = n)} azimuth={lit.azimuth + 180} elevation={lit.elevation - 6} />
-              </feSpecularLighting>
-              <feComposite in="lens2b" in2="sp1" operator="arithmetic" k2="1" k3="1" result="lens3" />
-              <feComposite in="lens3" in2="sp2" operator="arithmetic" k2="1" k3="1" result="lens4" />
-              {/* 9 · keep the backdrop's own alpha: while a freshly animating layer has no backdrop yet, the rim and lighting terms would otherwise paint solid black */}
+              <feColorMatrix ref={(n) => (lightRef.current[1] = n)} in="field" type="matrix" values={faceValues(lit.azimuth, 1)} result="f2r" />
+              <feComponentTransfer in="f2r" result="f2">
+                <feFuncR type="linear" slope="1.4" intercept="-0.7" />
+              </feComponentTransfer>
+              <feComposite in="f1" in2="f2" operator="arithmetic" k2="1" k3="1" result="faceR" />
+              <feColorMatrix in="faceR" type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" result="face" />
+              <feComponentTransfer in="edge" result="edgeThin">
+                <feFuncR type="gamma" amplitude="1" exponent="3" offset="0" />
+                <feFuncG type="gamma" amplitude="1" exponent="3" offset="0" />
+                <feFuncB type="gamma" amplitude="1" exponent="3" offset="0" />
+              </feComponentTransfer>
+              <feComposite in="face" in2="edgeThin" operator="arithmetic" k1="0.95" result="shine" />
+              <feComponentTransfer in="edge" result="contour">
+                <feFuncR type="gamma" amplitude="0.16" exponent="8" offset="0" />
+                <feFuncG type="gamma" amplitude="0.16" exponent="8" offset="0" />
+                <feFuncB type="gamma" amplitude="0.16" exponent="8" offset="0" />
+              </feComponentTransfer>
+              <feComposite in="lens2" in2="shine" operator="arithmetic" k2="1" k3="1" result="lens3" />
+              <feComposite in="lens3" in2="contour" operator="arithmetic" k2="1" k3="1" result="lens4" />
+              {/* 9 · keep the backdrop's own alpha: while a freshly animating layer has no backdrop yet, the additive terms would otherwise paint solid black */}
               <feComposite in="lens4" in2="SourceGraphic" operator="in" />
             </filter>
           )}

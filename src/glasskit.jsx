@@ -189,11 +189,12 @@ export function GlassToggle() {
       aria-pressed={on}
       onClick={() => setOn(!on)}
     >
+      {/* the knob is larger than the fill and reaches the capsule's inner rim, so the fill's edge passes through it and bends */}
       <Glass
         className="gt-knob"
-        radius={19}
-        depth={9}
-        thickness={20}
+        radius={22}
+        depth={10}
+        thickness={24}
         tint={0.03}
         style={{ transform: `translateX(${on ? 44 : 0}px)`, transition: `transform ${T_POP} ${POP}` }}
       />

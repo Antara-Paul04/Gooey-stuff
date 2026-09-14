@@ -1074,10 +1074,12 @@ button {
 .gl {
   position: relative;
   display: block;
-  /* depth: a soft shadow, the way thick glass sits on a surface */
+  /* depth: the shadow is rimmed — a tight dark line hugging the edge, a
+     whisper of contact, and only a faint pool below */
   box-shadow:
-    0 14px 34px rgba(0, 0, 0, 0.14),
-    0 2px 6px rgba(0, 0, 0, 0.08);
+    0 0 0 0.6px rgba(0, 0, 0, 0.16),
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 8px 18px -10px rgba(0, 0, 0, 0.14);
 }
 .gl-defs {
   position: absolute;
@@ -1221,7 +1223,10 @@ button.gl {
   padding: 0;
   background: none;
   border: 0;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 0 0 0.6px rgba(0, 0, 0, 0.14),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 12px 26px -14px rgba(0, 0, 0, 0.16);
 }
 .glass-dock > .gl-body {
   display: flex;
@@ -1241,12 +1246,6 @@ button.gl {
   width: 52px;
   height: 52px;
   will-change: transform;
-}
-.site.glass .dock-btn {
-  color: rgba(255, 255, 255, 0.6);
-}
-.site.glass .dock-btn.on {
-  color: #fff;
 }
 
 /* slider */
@@ -1273,16 +1272,23 @@ button.gl {
 .glass-toggle.on {
   background: none;
   border: 0;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 0 0 0.6px rgba(0, 0, 0, 0.16),
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 8px 18px -10px rgba(0, 0, 0, 0.14);
   transition: none;
 }
 .gt-knob {
   position: absolute;
-  left: 7px;
-  top: 7px;
-  width: 38px;
-  height: 38px;
+  left: 4px;
+  top: 4px;
+  width: 44px;
+  height: 44px;
   will-change: transform;
+  box-shadow:
+    0 0 0 0.6px rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.16),
+    0 4px 8px -4px rgba(0, 0, 0, 0.18);
 }
 
 /* search */
@@ -1307,9 +1313,6 @@ button.gl {
   opacity: 1;
   transition: opacity 0.22s ease 0.18s;
 }
-.site.glass .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.55);
-}
 
 /* submit */
 .gsubmit {
@@ -1320,7 +1323,6 @@ button.gl {
   height: 52px;
   transform: translateX(-50%);
   transition: width 0.5s cubic-bezier(0.34, 1.1, 0.36, 1);
-  color: #fff;
 }
 .gsubmit.loading {
   width: 52px;
@@ -1333,13 +1335,6 @@ button.gl {
 .gsubmit.done .submit-face.done {
   opacity: 1;
   transition: opacity 0.18s ease 0.1s;
-}
-.gsubmit .submit-spin {
-  border-color: rgba(255, 255, 255, 0.28);
-  border-top-color: #fff;
-}
-.site.glass .submit-ghost {
-  color: rgba(255, 255, 255, 0.55);
 }
 
 /* spinner + loader beads */
@@ -1357,7 +1352,9 @@ button.gl {
 }
 .gsp-bead .gl,
 .gld-bead .gl {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.14),
+    0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* material switch in the top bar */
@@ -1464,8 +1461,11 @@ button.gl {
   border-radius: 48px;
   pointer-events: none;
   will-change: transform;
-  /* depth: one low contact shadow, nothing drawn on the glass itself */
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.16);
+  /* depth: a soft pool under the lens, nothing drawn on the glass itself */
+  box-shadow:
+    0 0 0 0.6px rgba(0, 0, 0, 0.16),
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 12px 26px -14px rgba(0, 0, 0, 0.16);
 }
 .lens-refract {
   position: absolute;
