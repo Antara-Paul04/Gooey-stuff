@@ -172,9 +172,9 @@ export function GlassSlider({ variant = 'single' }) {
 }
 
 /* -------------------------------------------------------------- toggle --
-   A clear glass capsule with the colour filling it — grey off, green on —
-   and a clear knob riding on the colour. The glass rim bends the colour's
-   edge; the knob's rim bends whatever it crosses. */
+   One glass capsule whose colour IS the track — grey off, green on, edge to
+   edge under the glass, so the only edge is the rim bending it — and a
+   clear knob riding on it. */
 export function GlassToggle() {
   const [on, setOn] = useState(true)
   return (
@@ -186,7 +186,6 @@ export function GlassToggle() {
       thickness={17}
       tint={0.02}
       film={on ? '#34c759' : '#cfcfd6'}
-      filmInset={2}
       aria-pressed={on}
       onClick={() => setOn(!on)}
     >

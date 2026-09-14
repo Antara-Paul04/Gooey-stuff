@@ -1116,13 +1116,8 @@ button.gl {
 /* the glass stage is a light blueprint ground (painted inline by <Stage>);
    the glass is clear, so everything riding on it goes dark */
 .site.glass .stage {
-  min-height: 540px;
   background: #e9e9ee;
   border-color: rgba(0, 0, 0, 0.08);
-}
-/* the glass needs size to read — the demos are shown larger than the gooey ones */
-.site.glass .stage > :not(.variants):not(.stage-hint) {
-  zoom: 1.6;
 }
 .site.glass .gl-body,
 .site.glass .search-ic,
