@@ -172,8 +172,10 @@ export function GlassSlider({ variant = 'single' }) {
 }
 
 /* -------------------------------------------------------------- toggle --
-   A thick clear capsule with the fill inset inside it — grey off, green on —
-   and a clear knob that bends the fill's edge as it crosses. */
+   Apple's hero toggle: a solid capsule of colour sitting slightly OFFSET
+   from the clear glass capsule, so it pokes out on one side and the glass
+   rim crosses its edges on the other — that crossing is where the bend
+   shows — with a clear knob straddling the colour's edge. */
 export function GlassToggle() {
   const [on, setOn] = useState(true)
   return (
@@ -181,21 +183,20 @@ export function GlassToggle() {
       as="button"
       className={`toggle glass-toggle${on ? ' on' : ''}`}
       radius={26}
-      depth={12}
-      thickness={26}
-      tint={0.02}
-      film={on ? '#34c759' : '#d4d4da'}
-      filmInset={7}
+      depth={13}
+      thickness={13}
+      tint={0.07}
+      film={on ? '#34c759' : '#cfcfd6'}
+      filmShift={on ? [-9, 6] : [9, 6]}
       aria-pressed={on}
       onClick={() => setOn(!on)}
     >
-      {/* the knob is larger than the fill and reaches the capsule's inner rim, so the fill's edge passes through it and bends */}
       <Glass
         className="gt-knob"
         radius={22}
         depth={10}
-        thickness={24}
-        tint={0.03}
+        thickness={11}
+        tint={0.06}
         style={{ transform: `translateX(${on ? 44 : 0}px)`, transition: `transform ${T_POP} ${POP}` }}
       />
     </Glass>

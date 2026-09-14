@@ -254,6 +254,7 @@ export function Glass({
   flex = true,
   film,
   filmInset = 0,
+  filmShift = [0, 0],
   light,
   className = '',
   style,
@@ -477,7 +478,12 @@ export function Glass({
       {film && (
         <span
           className="gl-film"
-          style={{ background: film, inset: filmInset, borderRadius: Math.max(0, radius - filmInset) }}
+          style={{
+            background: film,
+            inset: filmInset,
+            borderRadius: Math.max(0, radius - filmInset),
+            transform: `translate(${filmShift[0]}px, ${filmShift[1]}px)`,
+          }}
         />
       )}
       {/* the filter only exists once the element has been measured — a backdrop-filter pointing at a missing filter paints black */}
