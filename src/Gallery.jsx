@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import {
   DARK_SHADOW_SM,
   DockDemo,
@@ -10,7 +10,8 @@ import {
   ToggleDemo,
 } from './demos.jsx'
 import { BounceLoader, SpinnerDemo } from './loaders.jsx'
-import { DragPhoto, LensLab } from './lens.jsx'
+import { LensLab } from './lens.jsx'
+import { blueprintURL } from './glass.jsx'
 import {
   GlassDock,
   GlassLoader,
@@ -427,12 +428,24 @@ const y = -Math.sin(w * t - i * 0.82) * 22`,
   },
 ]
 
-/* the preview card; in glass mode a draggable photograph sits under the
-   component, so there is something to pull through the lens */
+/* the preview card; in glass mode it paints the blueprint ground — hairline
+   guides and colour bars the lenses get to bend — sized to the card */
 function Stage({ glass, children }) {
+  const ref = useRef(null)
+  const [size, setSize] = useState(null)
+  useLayoutEffect(() => {
+    if (!glass) return
+    const el = ref.current
+    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight })
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [glass])
+  const style =
+    glass && size ? { backgroundImage: `url("${blueprintURL(size.w, size.h)}")`, backgroundSize: '100% 100%' } : undefined
   return (
-    <div className="stage">
-      {glass && <DragPhoto />}
+    <div className="stage" ref={ref} style={style}>
       {children}
     </div>
   )

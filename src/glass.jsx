@@ -263,6 +263,7 @@ export function Glass({
   scatter = 0,
   flex = true,
   film,
+  filmInset = 0,
   light,
   className = '',
   style,
@@ -457,63 +458,68 @@ export function Glass({
               </feComponentTransfer>
               <feComposite in="lens2" in2="edgeLine" operator="arithmetic" k2="1" k3="1" result="lens2b" />
               {/* 8 · specular: a key light and a faint return light on the bezel */}
-              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.5" specularExponent="64" lightingColor="#fff" result="sp1">
+              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.4" specularExponent="64" lightingColor="#fff" result="sp1">
                 <feDistantLight ref={(n) => (lightRef.current[0] = n)} azimuth={lit.azimuth} elevation={lit.elevation} />
               </feSpecularLighting>
-              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.26" specularExponent="44" lightingColor="#fff" result="sp2">
+              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.2" specularExponent="44" lightingColor="#fff" result="sp2">
                 <feDistantLight ref={(n) => (lightRef.current[1] = n)} azimuth={lit.azimuth + 180} elevation={lit.elevation - 6} />
               </feSpecularLighting>
               <feComposite in="lens2b" in2="sp1" operator="arithmetic" k2="1" k3="1" result="lens3" />
-              <feComposite in="lens3" in2="sp2" operator="arithmetic" k2="1" k3="1" />
+              <feComposite in="lens3" in2="sp2" operator="arithmetic" k2="1" k3="1" result="lens4" />
+              {/* 9 · keep the backdrop's own alpha: while a freshly animating layer has no backdrop yet, the rim and lighting terms would otherwise paint solid black */}
+              <feComposite in="lens4" in2="SourceGraphic" operator="in" />
             </filter>
           )}
         </defs>
       </svg>
       {/* an optional coloured film UNDER the glass — part of the backdrop, so the rim and anything riding on top refract it */}
-      {film && <span className="gl-film" style={{ background: film }} />}
-      <span className="gl-lens" style={{ backdropFilter: filterCss, WebkitBackdropFilter: filterCss }} />
+      {film && (
+        <span
+          className="gl-film"
+          style={{ background: film, inset: filmInset, borderRadius: Math.max(0, radius - filmInset) }}
+        />
+      )}
+      {/* the filter only exists once the element has been measured — a backdrop-filter pointing at a missing filter paints black */}
+      <span className="gl-lens" style={w > 0 ? { backdropFilter: filterCss, WebkitBackdropFilter: filterCss } : undefined} />
       <span className="gl-body">{children}</span>
     </Tag>
   )
 }
 
-/* ------------------------------------------------------------ wallpaper --
-   The glass stage backdrop: bold colour fields with real edges, so the
-   lensing has something to bend. Sized to the stage. */
-const wallCache = new Map()
+/* ------------------------------------------------------------ blueprint --
+   The glass stage ground: Apple's hero shows the material on a plain light
+   surface with hairline guides and colour bars running under the glass —
+   the bend shows on the lines, no photograph needed. Sized to the stage. */
+const bpCache = new Map()
 
-export function wallpaperURL(w, h) {
+export function blueprintURL(w, h) {
   const key = `${w}x${h}`
-  if (!wallCache.has(key)) {
-    wallCache.set(key, 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(wallpaperSVG(w, h)))
+  if (!bpCache.has(key)) {
+    bpCache.set(key, 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(blueprintSVG(w, h)))
   }
-  return wallCache.get(key)
+  return bpCache.get(key)
 }
 
-function wallpaperSVG(w, h) {
-  // continuous colour everywhere: a lens magnifies what is under its centre,
-  // so the field must not have dark seams for it to land on
-  const field = (id, c, a) =>
-    `<radialGradient id="${id}" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="${c}" stop-opacity="${a}"/><stop offset=".7" stop-color="${c}" stop-opacity="${a * 0.92}"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`
-  const E = (cx, cy, rx, ry, fill, rot = 0) =>
-    `<ellipse cx="${cx * w}" cy="${cy * h}" rx="${rx * w}" ry="${ry * h}" fill="url(#${fill})" transform="rotate(${rot} ${cx * w} ${cy * h})"/>`
-  const band = (cx, cy, len, thick, c, a, rot) =>
-    `<rect x="${cx * w - len * w}" y="${cy * h - (thick * h) / 2}" width="${2 * len * w}" height="${thick * h}" rx="${(thick * h) / 2}" fill="${c}" fill-opacity="${a}" transform="rotate(${rot} ${cx * w} ${cy * h})"/>`
+function blueprintSVG(w, h) {
+  const cx = w / 2
+  const cy = h / 2
+  const line = 'stroke="#b4b4bf" stroke-width="1" fill="none" stroke-opacity=".75"'
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
 <defs>
-<linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b5cff"/><stop offset=".38" stop-color="#7c5cf6"/><stop offset=".68" stop-color="#ff4fa3"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient>
-${field('c', '#22d3ee', 0.95)}${field('v', '#8b5cf6', 0.9)}${field('o', '#ff9a4a', 0.95)}${field('p', '#ff4fa3', 0.9)}${field('b', '#3b6dff', 0.95)}
-<pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="11" cy="11" r="1.3" fill="#fff" fill-opacity=".26"/></pattern>
+<linearGradient id="bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1e5cf5"/><stop offset=".22" stop-color="#22c1e8"/><stop offset=".45" stop-color="#d23bd6"/><stop offset=".68" stop-color="#ff4d4d"/><stop offset=".86" stop-color="#ff9a2e"/><stop offset="1" stop-color="#8fd82e"/></linearGradient>
+<linearGradient id="blue" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f7cf6"/><stop offset="1" stop-color="#3b8cff"/></linearGradient>
 </defs>
-<rect width="100%" height="100%" fill="url(#base)"/>
-${E(0.2, 0.3, 0.26, 0.42, 'b', -18)}
-${E(0.5, 0.14, 0.2, 0.3, 'v', 8)}
-${E(0.82, 0.3, 0.22, 0.4, 'p', 14)}
-${E(0.3, 0.88, 0.3, 0.34, 'c', -8)}
-${E(0.66, 0.8, 0.22, 0.32, 'o', 0)}
-${band(0.36, 0.3, 0.5, 0.05, '#dfe6ff', 0.55, -16)}
-${band(0.7, 0.62, 0.42, 0.045, '#ffd6ea', 0.5, 12)}
-${band(0.46, 0.84, 0.5, 0.035, '#d3fff9', 0.5, -9)}
-<rect width="100%" height="100%" fill="url(#dots)"/>
+<rect width="100%" height="100%" fill="#e9e9ee"/>
+<circle cx="${cx}" cy="${cy}" r="${h * 0.19}" ${line}/>
+<circle cx="${cx}" cy="${cy}" r="${h * 0.34}" ${line}/>
+<circle cx="${cx - w * 0.3}" cy="${cy - h * 0.16}" r="${h * 0.22}" ${line}/>
+<circle cx="${cx + w * 0.3}" cy="${cy + h * 0.12}" r="${h * 0.26}" ${line}/>
+<rect x="${cx - w * 0.26}" y="${cy - h * 0.14}" width="${w * 0.52}" height="${h * 0.28}" rx="${h * 0.14}" ${line}/>
+<line x1="0" y1="${cy}" x2="${w}" y2="${cy}" ${line}/>
+<line x1="${cx}" y1="0" x2="${cx}" y2="${h}" ${line}/>
+<line x1="0" y1="${cy - h * 0.3}" x2="${w}" y2="${cy - h * 0.3}" ${line}/>
+<line x1="0" y1="${cy + h * 0.3}" x2="${w}" y2="${cy + h * 0.3}" ${line}/>
+<rect x="${cx - w * 0.5}" y="${cy + h * 0.085}" width="${w * 0.42}" height="${h * 0.095}" rx="${h * 0.0475}" fill="url(#blue)"/>
+<rect x="${cx + w * 0.02}" y="${cy - h * 0.16}" width="${w * 0.48}" height="${h * 0.11}" rx="${h * 0.055}" fill="url(#bar)"/>
 </svg>`
 }

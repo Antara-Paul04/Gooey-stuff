@@ -1076,8 +1076,8 @@ button {
   display: block;
   /* depth: a soft shadow, the way thick glass sits on a surface */
   box-shadow:
-    0 16px 36px rgba(0, 0, 0, 0.34),
-    0 2px 6px rgba(0, 0, 0, 0.22);
+    0 14px 34px rgba(0, 0, 0, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.08);
 }
 .gl-defs {
   position: absolute;
@@ -1111,49 +1111,59 @@ button.gl {
   cursor: pointer;
 }
 
-/* the stage keeps the gooey graphite ground; the photograph under the
-   components is what the glass gets to bend */
-.site.glass .stage > :not(.stage-photo) {
-  z-index: 1;
+/* the glass stage is a light blueprint ground (painted inline by <Stage>);
+   the glass is clear, so everything riding on it goes dark */
+.site.glass .stage {
+  background: #e9e9ee;
+  border-color: rgba(0, 0, 0, 0.08);
 }
-.stage-photo {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 0;
-  width: 380px;
-  border-radius: 14px;
-  overflow: hidden;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-  will-change: transform;
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.55),
-    0 2px 8px rgba(0, 0, 0, 0.4);
+.site.glass .gl-body,
+.site.glass .search-ic,
+.site.glass .search-input,
+.site.glass .submit,
+.site.glass .dock-btn.on {
+  color: #1d1d1f;
 }
-.stage-photo.dragging {
-  cursor: grabbing;
+.site.glass .dock-btn {
+  color: rgba(29, 29, 31, 0.55);
 }
-.stage-photo img {
-  display: block;
-  width: 100%;
-  height: auto;
-  pointer-events: none;
+.site.glass .submit-ghost {
+  color: rgba(29, 29, 31, 0.5);
 }
-.stage-photo-tag {
-  position: absolute;
-  left: 12px;
-  bottom: 10px;
-  padding: 4px 9px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.45);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.85);
-  pointer-events: none;
+.site.glass .submit-face,
+.site.glass .search-input {
+  text-shadow: none;
+}
+.site.glass .search-input::placeholder {
+  color: rgba(29, 29, 31, 0.45);
+}
+.site.glass .submit-spin {
+  border-color: rgba(29, 29, 31, 0.22);
+  border-top-color: #1d1d1f;
+}
+.site.glass .slider-track {
+  background: rgba(29, 29, 31, 0.12);
+  box-shadow: none;
+}
+.site.glass .slider-fill {
+  background: #2f7cf6;
+}
+.site.glass .variants {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+.site.glass .vpill {
+  color: rgba(29, 29, 31, 0.55);
+}
+.site.glass .vpill:hover {
+  color: #1d1d1f;
+}
+.site.glass .vpill.on {
+  background: #1d1d1f;
+  color: #fff;
+}
+.site.glass .stage-hint {
+  color: rgba(29, 29, 31, 0.5);
 }
 
 /* menu */
@@ -1211,7 +1221,7 @@ button.gl {
   padding: 0;
   background: none;
   border: 0;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
 }
 .glass-dock > .gl-body {
   display: flex;
@@ -1263,7 +1273,7 @@ button.gl {
 .glass-toggle.on {
   background: none;
   border: 0;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
   transition: none;
 }
 .gt-knob {
@@ -1318,8 +1328,11 @@ button.gl {
 .gsubmit.done {
   width: 148px;
 }
-.gsubmit .submit-face {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+.gsubmit.idle .submit-face.idle,
+.gsubmit.loading .submit-face.loading,
+.gsubmit.done .submit-face.done {
+  opacity: 1;
+  transition: opacity 0.18s ease 0.1s;
 }
 .gsubmit .submit-spin {
   border-color: rgba(255, 255, 255, 0.28);
@@ -1344,7 +1357,7 @@ button.gl {
 }
 .gsp-bead .gl,
 .gld-bead .gl {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* material switch in the top bar */
