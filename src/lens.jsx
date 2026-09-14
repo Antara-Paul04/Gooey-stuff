@@ -45,9 +45,13 @@ function rbox(x, y, W, H, r) {
 
 /* Displacement map. `bevel` is the width of the curved rim in px, `shift`
    the bend at the rim in px, `power` how quickly it settles toward the flat
-   middle. Channels are encoded at ±64 around 128 rather than the full
-   range: Chrome converts the map to the display profile before sampling and
-   under-bends near the extremes, so the scale is doubled instead. */
+   middle. The magnitude follows the exact distance to the rounded edge; the
+   DIRECTION comes from a smooth superellipse field, because the rounded
+   rectangle's own gradient flips along the corner diagonals and a bevel
+   wider than the corner radius would show that as a crease. Channels are
+   encoded at ±64 around 128 rather than the full range: Chrome converts the
+   map to the display profile before sampling and under-bends near the
+   extremes, so the scale is doubled instead. */
 export function lensMap(W, H, r, bevel, shift, power = 2) {
   const K = 64
   const c = document.createElement('canvas')
@@ -56,15 +60,26 @@ export function lensMap(W, H, r, bevel, shift, power = 2) {
   const ctx = c.getContext('2d')
   const img = ctx.createImageData(W, H)
   const px = img.data
+  const a = W / 2
+  const b = H / 2
+  const n = 4
+  const rho = (x, y) => Math.pow(Math.pow(Math.abs(x) / a, n) + Math.pow(Math.abs(y) / b, n), 1 / n)
   for (let j = 0; j < H; j++) {
     for (let i = 0; i < W; i++) {
-      const { d, gx, gy } = rbox(i + 0.5, j + 0.5, W, H, r)
+      const { d } = rbox(i + 0.5, j + 0.5, W, H, r)
       const o = (j * W + i) * 4
       let vx = 0
       let vy = 0
       if (d > 0 && d < bevel) {
-        // the bend points inward: through a curved rim you see the inside of
-        // the lens pulled out toward the edge
+        const x = i + 0.5 - a
+        const y = j + 0.5 - b
+        const e = 0.5
+        let gx = rho(x + e, y) - rho(x - e, y)
+        let gy = rho(x, y + e) - rho(x, y - e)
+        const len = Math.hypot(gx, gy) || 1
+        // inward: through a curved rim you see the inside of the lens pulled out toward the edge
+        gx = -gx / len
+        gy = -gy / len
         const m = Math.pow(1 - d / bevel, power) * shift
         vx = gx * m
         vy = gy * m
@@ -134,10 +149,10 @@ const spring = (st, target, k, damp, dt) => {
    one lens that follows the cursor. */
 const LW = 300
 const LH = 200
-const LR = 48
-const BEVEL = 58 // width of the curved rim, px
-const SHIFT = 17 // bend at the rim, px
-const POWER = 1.7 // how quickly the bend settles toward the flat middle
+const LR = 34
+const BEVEL = 74 // width of the curved rim, px
+const SHIFT = 38 // bend at the rim, px
+const POWER = 1.25 // how quickly the bend settles toward the flat middle — low keeps the band strong
 const CHROMA = 0.012 // per-channel spread of the bend — a hint, not a rainbow
 const BLUR = 0 // clear glass: no blur, only the bend
 const TINT = 0.03
@@ -211,7 +226,8 @@ export function LensLab() {
             primitiveUnits="userSpaceOnUse"
             colorInterpolationFilters="sRGB"
           >
-            <feImage href={map.url} x="0" y="0" width={LW} height={LH} preserveAspectRatio="none" result="map" />
+            <feImage href={map.url} x="0" y="0" width={LW} height={LH} preserveAspectRatio="none" result="map0" />
+            <feGaussianBlur in="map0" stdDeviation="1" result="map" />
             {/* refraction — three passes, one per channel, screened back together */}
             <feDisplacementMap in="SourceGraphic" in2="map" scale={S * (1 - CHROMA)} xChannelSelector="R" yChannelSelector="G" result="dr" />
             <feDisplacementMap in="SourceGraphic" in2="map" scale={S} xChannelSelector="R" yChannelSelector="G" result="dg" />

@@ -32,8 +32,8 @@ const ETA = 1 / 1.5
    inner end of the bezel (Apple's rim distorts most right at the boundary).
    `power` shapes the fall-off. */
 const PROFILES = {
-  circle: (x) => Math.pow(Math.max(0, 1 - x), 1.6),
-  squircle: (x) => Math.pow(Math.max(0, 1 - x), 2.2),
+  circle: (x) => Math.pow(Math.max(0, 1 - x), 1.25),
+  squircle: (x) => Math.pow(Math.max(0, 1 - x), 2),
 }
 
 function shiftTable(f, b, T, n = 160) {
@@ -268,8 +268,8 @@ export function Glass({
   const funcRef = useRef([])
   const lightRef = useRef([])
   const [size, setSize] = useState({ w: 0, h: 0 })
-  const b = depth ?? Math.max(5, Math.round(radius * 0.38))
-  const T = thickness ?? Math.max(4, Math.round(b * 0.85))
+  const b = depth ?? Math.max(6, Math.round(radius * 0.45))
+  const T = thickness ?? Math.max(5, Math.round(b * 1.3))
   const lit = light ?? DEFAULT_LIGHT
   const g = useMemo(() => glassTiles(radius, b, T, profile), [radius, b, T, profile])
   const R = Math.round(radius * 1.7)
@@ -375,8 +375,10 @@ export function Glass({
               primitiveUnits="userSpaceOnUse"
               colorInterpolationFilters="sRGB"
             >
-              {/* 1 · the refraction field, 9-sliced */}
-              <feFlood floodColor="rgb(128,128,128)" result="flat" />
+              {/* 1 · the refraction field, 9-sliced. Blue is the distance in from the rim, so the
+                  flood under the tiles must read as fully interior (255), or the flat middle of a
+                  wide element gets the edge treatment */}
+              <feFlood floodColor="rgb(128,128,255)" result="flat" />
               <feImage href={g.tiles.tl} x="0" y="0" width={s} height={s} preserveAspectRatio="none" result="tl" />
               <feImage href={g.tiles.tr} x={w - s} y="0" width={s} height={s} preserveAspectRatio="none" result="tr" />
               <feImage href={g.tiles.bl} x="0" y={h - s} width={s} height={s} preserveAspectRatio="none" result="bl" />
