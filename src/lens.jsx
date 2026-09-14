@@ -153,7 +153,7 @@ const LR = 34
 const BEVEL = 74 // width of the curved rim, px
 const SHIFT = 38 // bend at the rim, px
 const POWER = 1.25 // how quickly the bend settles toward the flat middle — low keeps the band strong
-const CHROMA = 0.012 // per-channel spread of the bend — a hint, not a rainbow
+const CHROMA = 0.006 // per-channel spread of the bend — a hint, not a rainbow
 const BLUR = 0 // clear glass: no blur, only the bend
 const TINT = 0.03
 
