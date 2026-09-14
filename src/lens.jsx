@@ -251,3 +251,54 @@ export function LensLab() {
     </div>
   )
 }
+
+/* ---------------------------------------------------------- <DragPhoto> --
+   A photograph on the component stage, draggable, sitting under the glass
+   components — drag it through a lens to see the material bend it. */
+export function DragPhoto() {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    const stage = el.parentElement
+    const pos = { x: stage.clientWidth * 0.5 - 250, y: stage.clientHeight * 0.5 - 30 }
+    let grab = null
+    const place = () => {
+      el.style.transform = `translate(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px)`
+    }
+    const down = (e) => {
+      grab = { x: e.clientX - pos.x, y: e.clientY - pos.y }
+      el.setPointerCapture(e.pointerId)
+      el.classList.add('dragging')
+      e.preventDefault()
+    }
+    const move = (e) => {
+      if (!grab) return
+      const w = stage.clientWidth
+      const h = stage.clientHeight
+      pos.x = Math.max(-el.offsetWidth * 0.7, Math.min(w - el.offsetWidth * 0.3, e.clientX - grab.x))
+      pos.y = Math.max(-el.offsetHeight * 0.7, Math.min(h - el.offsetHeight * 0.3, e.clientY - grab.y))
+      place()
+    }
+    const up = () => {
+      grab = null
+      el.classList.remove('dragging')
+    }
+    el.addEventListener('pointerdown', down)
+    el.addEventListener('pointermove', move)
+    el.addEventListener('pointerup', up)
+    el.addEventListener('pointercancel', up)
+    place()
+    return () => {
+      el.removeEventListener('pointerdown', down)
+      el.removeEventListener('pointermove', move)
+      el.removeEventListener('pointerup', up)
+      el.removeEventListener('pointercancel', up)
+    }
+  }, [])
+  return (
+    <div className="stage-photo" ref={ref} aria-label="Drag the photograph">
+      <img src={PHOTO} alt="" draggable="false" />
+      <span className="stage-photo-tag">drag me</span>
+    </div>
+  )
+}

@@ -1074,8 +1074,10 @@ button {
 .gl {
   position: relative;
   display: block;
-  /* depth without a card: one soft, low contact shadow */
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+  /* depth: a soft shadow, the way thick glass sits on a surface */
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.34),
+    0 2px 6px rgba(0, 0, 0, 0.22);
 }
 .gl-defs {
   position: absolute;
@@ -1089,40 +1091,69 @@ button {
   border-radius: inherit;
   pointer-events: none;
 }
+.gl-film {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: background 0.35s ease;
+  pointer-events: none;
+}
 .gl-body {
   position: relative;
   display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
+  border-radius: inherit;
   color: #fff;
 }
 button.gl {
   cursor: pointer;
 }
 
-.site.glass .stage {
-  background: #5b5cf0;
-  border-color: rgba(255, 255, 255, 0.1);
+/* the stage keeps the gooey graphite ground; the photograph under the
+   components is what the glass gets to bend */
+.site.glass .stage > :not(.stage-photo) {
+  z-index: 1;
 }
-/* faint lines drifting under the components, so something is always passing
-   through the glass */
-.stage-drift {
+.stage-photo {
   position: absolute;
-  top: -20%;
-  bottom: -20%;
-  left: -20%;
-  width: 140%;
-  background: repeating-linear-gradient(90deg, transparent 0 58px, rgba(255, 255, 255, 0.075) 58px 66px);
-  background-size: 66px 100%;
-  transform: skewX(-14deg);
-  animation: stage-drift 6s linear infinite;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: 380px;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  will-change: transform;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.stage-photo.dragging {
+  cursor: grabbing;
+}
+.stage-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
   pointer-events: none;
 }
-@keyframes stage-drift {
-  to {
-    background-position: 66px 0;
-  }
+.stage-photo-tag {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  pointer-events: none;
 }
 
 /* menu */

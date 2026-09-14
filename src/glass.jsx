@@ -255,13 +255,14 @@ export function Glass({
   depth,
   thickness,
   profile = 'circle',
-  frost = 0,
+  frost = 1.6,
   dispersion = 0.045,
-  saturate = 1.1,
-  tint = 0.03,
+  saturate = 1.06,
+  tint = 0.14,
   ambient = 0.09,
   scatter = 1.1,
   flex = true,
+  film,
   light,
   className = '',
   style,
@@ -275,8 +276,8 @@ export function Glass({
   const funcRef = useRef([])
   const lightRef = useRef([])
   const [size, setSize] = useState({ w: 0, h: 0 })
-  const b = depth ?? Math.max(5, Math.round(radius * 0.5))
-  const T = thickness ?? Math.round(b * 1.4)
+  const b = depth ?? Math.max(5, Math.round(radius * 0.32))
+  const T = thickness ?? Math.round(b * 1.5)
   const lit = light ?? DEFAULT_LIGHT
   const g = useMemo(() => glassTiles(radius, b, T, profile), [radius, b, T, profile])
   const R = Math.round(radius * 1.7)
@@ -447,21 +448,29 @@ export function Glass({
               {/* 6 · translucent material: a breath of white and the ambient colour of the surroundings */}
               <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="amb" />
               <feComposite in="lens0" in2="amb" operator="arithmetic" k2={1 - tint - ambient} k3={ambient} k4={tint} result="lens1" />
-              {/* 7 · thickness: the bezel holds a little less light than the top */}
-              <feComposite in="lens1" in2="core" operator="arithmetic" k1="0.07" k2="0.93" result="lens2" />
+              {/* 7 · thickness: the bezel reflects the darker surroundings, then a thin bright line rides its very edge */}
+              <feComposite in="lens1" in2="core" operator="arithmetic" k1="0.3" k2="0.7" result="lens2" />
+              <feComponentTransfer in="edge" result="edgeLine">
+                <feFuncR type="gamma" amplitude="0.45" exponent="7" offset="0" />
+                <feFuncG type="gamma" amplitude="0.45" exponent="7" offset="0" />
+                <feFuncB type="gamma" amplitude="0.45" exponent="7" offset="0" />
+              </feComponentTransfer>
+              <feComposite in="lens2" in2="edgeLine" operator="arithmetic" k2="1" k3="1" result="lens2b" />
               {/* 8 · specular: a key light and a faint return light on the bezel */}
-              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.42" specularExponent="56" lightingColor="#fff" result="sp1">
+              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.5" specularExponent="64" lightingColor="#fff" result="sp1">
                 <feDistantLight ref={(n) => (lightRef.current[0] = n)} azimuth={lit.azimuth} elevation={lit.elevation} />
               </feSpecularLighting>
-              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.13" specularExponent="36" lightingColor="#fff" result="sp2">
+              <feSpecularLighting in="hS" surfaceScale={T * 0.9} specularConstant="0.26" specularExponent="44" lightingColor="#fff" result="sp2">
                 <feDistantLight ref={(n) => (lightRef.current[1] = n)} azimuth={lit.azimuth + 180} elevation={lit.elevation - 6} />
               </feSpecularLighting>
-              <feComposite in="lens2" in2="sp1" operator="arithmetic" k2="1" k3="1" result="lens3" />
+              <feComposite in="lens2b" in2="sp1" operator="arithmetic" k2="1" k3="1" result="lens3" />
               <feComposite in="lens3" in2="sp2" operator="arithmetic" k2="1" k3="1" />
             </filter>
           )}
         </defs>
       </svg>
+      {/* an optional coloured film UNDER the glass — part of the backdrop, so the rim and anything riding on top refract it */}
+      {film && <span className="gl-film" style={{ background: film }} />}
       <span className="gl-lens" style={{ backdropFilter: filterCss, WebkitBackdropFilter: filterCss }} />
       <span className="gl-body">{children}</span>
     </Tag>

@@ -5,7 +5,7 @@ Eight React components in two materials, on a small docs site built for screensh
 - **Gooey** — soft bodies built on [`liquid-gooey`](https://www.npmjs.com/package/liquid-gooey). Every state change is liquid: pieces stretch, tear, trail and merge while the icons riding on top stay crisp.
 - **Glass** — the same eight as Liquid Glass. Rigid lenses that refract whatever is really behind them, with a specular that follows the cursor and a little gel give when you touch them.
 
-Components: Menu, Dock (Rail / Bar), Slider (Single / Range), Toggle, Search, Submit, Spinner (Comet / Arc / Dual), Loader. The Glass side also has a **Material** page — the lens on its own over hard colour bands, for looking at the optics.
+Components: Menu, Dock (Rail / Bar), Slider (Single / Range), Toggle, Search, Submit, Spinner (Comet / Arc / Dual), Loader. In Glass, a photograph sits on the stage under the components — drag it through them to watch the material bend it. The Glass side also has a **Material** page: one lens that follows the cursor over a photograph, black type, hairlines and a gradient, for looking at the optics on their own.
 
 ## Run it
 

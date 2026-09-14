@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import {
   DARK_SHADOW_SM,
   DockDemo,
@@ -10,8 +10,7 @@ import {
   ToggleDemo,
 } from './demos.jsx'
 import { BounceLoader, SpinnerDemo } from './loaders.jsx'
-import { wallpaperURL } from './glass.jsx'
-import { LensLab } from './lens.jsx'
+import { DragPhoto, LensLab } from './lens.jsx'
 import {
   GlassDock,
   GlassLoader,
@@ -428,30 +427,12 @@ const y = -Math.sin(w * t - i * 0.82) * 22`,
   },
 ]
 
-/* the preview card; in glass mode it paints the generated wallpaper that the
-   lenses refract, sized to the card so the two line up */
+/* the preview card; in glass mode a draggable photograph sits under the
+   component, so there is something to pull through the lens */
 function Stage({ glass, children }) {
-  const ref = useRef(null)
-  const [size, setSize] = useState(null)
-  useLayoutEffect(() => {
-    if (!glass) return
-    const el = ref.current
-    const measure = () => {
-      const r = el.getBoundingClientRect()
-      setSize({ w: Math.round(r.width), h: Math.round(r.height) })
-    }
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [glass])
-  const style =
-    glass && size
-      ? { backgroundImage: `url("${wallpaperURL(size.w, size.h)}")`, backgroundSize: '100% 100%', backgroundOrigin: 'border-box' }
-      : undefined
   return (
-    <div className="stage" ref={ref} style={style}>
-      {glass && <div className="stage-drift" aria-hidden="true" />}
+    <div className="stage">
+      {glass && <DragPhoto />}
       {children}
     </div>
   )
