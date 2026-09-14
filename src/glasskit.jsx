@@ -172,23 +172,12 @@ export function GlassSlider({ variant = 'single' }) {
 }
 
 /* -------------------------------------------------------------- toggle --
-   One glass capsule whose colour IS the track — grey off, green on, edge to
-   edge under the glass, so the only edge is the rim bending it — and a
-   clear knob riding on it. */
+   A flat track — grey off, green on — and only the knob is glass: a clear
+   disc riding on the colour, bending its edge as it crosses. */
 export function GlassToggle() {
   const [on, setOn] = useState(true)
   return (
-    <Glass
-      as="button"
-      className={`toggle glass-toggle${on ? ' on' : ''}`}
-      radius={26}
-      depth={13}
-      thickness={17}
-      tint={0.02}
-      film={on ? '#34c759' : '#cfcfd6'}
-      aria-pressed={on}
-      onClick={() => setOn(!on)}
-    >
+    <button className={`toggle glass-toggle${on ? ' on' : ''}`} aria-pressed={on} onClick={() => setOn(!on)}>
       <Glass
         className="gt-knob"
         radius={22}
@@ -197,7 +186,7 @@ export function GlassToggle() {
         tint={0.03}
         style={{ transform: `translateX(${on ? 44 : 0}px)`, transition: `transform ${T_POP} ${POP}` }}
       />
-    </Glass>
+    </button>
   )
 }
 
