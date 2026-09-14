@@ -185,9 +185,9 @@ export function GlassToggle() {
       radius={26}
       depth={13}
       thickness={13}
-      tint={0.07}
+      tint={0.02}
       film={on ? '#34c759' : '#cfcfd6'}
-      filmShift={on ? [-9, 6] : [9, 6]}
+      filmShift={on ? [-7, 5] : [7, 5]}
       aria-pressed={on}
       onClick={() => setOn(!on)}
     >
