@@ -139,7 +139,7 @@ const BEVEL = 58 // width of the curved rim, px
 const SHIFT = 17 // bend at the rim, px
 const POWER = 1.7 // how quickly the bend settles toward the flat middle
 const CHROMA = 0.012 // per-channel spread of the bend — a hint, not a rainbow
-const BLUR = 0.25 // px, inside the glass only
+const BLUR = 0 // clear glass: no blur, only the bend
 const TINT = 0.03
 
 export function LensLab() {
@@ -195,7 +195,7 @@ export function LensLab() {
   }, [])
 
   const S = map.scale
-  const backdrop = `url(#${fid}) blur(${BLUR}px)`
+  const backdrop = BLUR > 0 ? `url(#${fid}) blur(${BLUR}px)` : `url(#${fid})`
 
   return (
     <div className="lens-scene" ref={sceneRef}>

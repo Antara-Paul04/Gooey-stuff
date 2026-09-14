@@ -255,12 +255,12 @@ export function Glass({
   depth,
   thickness,
   profile = 'circle',
-  frost = 1.6,
-  dispersion = 0.045,
-  saturate = 1.06,
-  tint = 0.14,
-  ambient = 0.09,
-  scatter = 1.1,
+  frost = 0,
+  dispersion = 0.02,
+  saturate = 1,
+  tint = 0.04,
+  ambient = 0,
+  scatter = 0,
   flex = true,
   film,
   light,
@@ -276,8 +276,8 @@ export function Glass({
   const funcRef = useRef([])
   const lightRef = useRef([])
   const [size, setSize] = useState({ w: 0, h: 0 })
-  const b = depth ?? Math.max(5, Math.round(radius * 0.32))
-  const T = thickness ?? Math.round(b * 1.5)
+  const b = depth ?? Math.max(5, Math.round(radius * 0.38))
+  const T = thickness ?? Math.round(b * 2)
   const lit = light ?? DEFAULT_LIGHT
   const g = useMemo(() => glassTiles(radius, b, T, profile), [radius, b, T, profile])
   const R = Math.round(radius * 1.7)
@@ -440,7 +440,7 @@ export function Glass({
               <feGaussianBlur in="hA" stdDeviation="0.7" result="hS" />
               <feColorMatrix in="hS" type="matrix" values="0 0 0 -1 1  0 0 0 -1 1  0 0 0 -1 1  0 0 0 0 1" result="edge" />
               <feColorMatrix in="hS" type="matrix" values="0 0 0 1 0  0 0 0 1 0  0 0 0 1 0  0 0 0 0 1" result="core" />
-              {/* 5 · scattering lives in the bezel only */}
+              {/* 5 · scattering lives in the bezel only (off by default: clear glass) */}
               <feGaussianBlur in="bent" stdDeviation={scatter} result="soft" />
               <feComposite in="soft" in2="edge" operator="arithmetic" k1="1" result="softE" />
               <feComposite in="bent" in2="core" operator="arithmetic" k1="1" result="bentC" />
@@ -449,7 +449,7 @@ export function Glass({
               <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="amb" />
               <feComposite in="lens0" in2="amb" operator="arithmetic" k2={1 - tint - ambient} k3={ambient} k4={tint} result="lens1" />
               {/* 7 · thickness: the bezel reflects the darker surroundings, then a thin bright line rides its very edge */}
-              <feComposite in="lens1" in2="core" operator="arithmetic" k1="0.3" k2="0.7" result="lens2" />
+              <feComposite in="lens1" in2="core" operator="arithmetic" k1="0.12" k2="0.88" result="lens2" />
               <feComponentTransfer in="edge" result="edgeLine">
                 <feFuncR type="gamma" amplitude="0.45" exponent="7" offset="0" />
                 <feFuncG type="gamma" amplitude="0.45" exponent="7" offset="0" />

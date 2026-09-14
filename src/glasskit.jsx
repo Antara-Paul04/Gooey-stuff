@@ -86,7 +86,7 @@ export function GlassDock({ variant = 'vertical' }) {
   const [active, setActive] = useState(0)
   const row = variant === 'horizontal'
   return (
-    <Glass className={`dock glass-dock${row ? ' row' : ''}`} radius={32} frost={4} tint={0.06} ambient={0.12}>
+    <Glass className={`dock glass-dock${row ? ' row' : ''}`} radius={32} tint={0.05}>
       <Glass
         className="gd-bubble"
         radius={26}
@@ -179,8 +179,7 @@ export function GlassToggle() {
       as="button"
       className={`toggle glass-toggle${on ? ' on' : ''}`}
       radius={26}
-      frost={2}
-      tint={0.03}
+      tint={0.02}
       film={on ? 'rgba(52, 199, 89, 0.92)' : 'rgba(255, 255, 255, 0.86)'}
       aria-pressed={on}
       onClick={() => setOn(!on)}
@@ -203,8 +202,7 @@ export function GlassSearch() {
       <Glass
         className={`gsearch${open ? ' open' : ''}`}
         radius={26}
-        frost={open ? 4 : 0}
-        tint={open ? 0.06 : 0.035}
+        tint={open ? 0.06 : 0.04}
       >
         <button
           className="search-ic"
