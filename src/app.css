@@ -1125,96 +1125,6 @@ button.gl {
   }
 }
 
-/* the material lab */
-.lab {
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 470px;
-  border-radius: 22px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #0c0e22;
-}
-.lab-bg {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: calc(100% + 430px);
-  background: repeating-linear-gradient(
-    100deg,
-    #2b5cff 0 84px,
-    #22d3ee 84px 168px,
-    #8b5cf6 168px 252px,
-    #ff4fa3 252px 336px,
-    #ff8a3d 336px 420px
-  );
-  animation: lab-drift 18s linear infinite;
-}
-@keyframes lab-drift {
-  to {
-    transform: translateX(-426.47px);
-  }
-}
-.lab-text {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-family: 'Baloo 2', 'Quicksand', ui-rounded, system-ui, sans-serif;
-  font-size: 128px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  color: rgba(255, 255, 255, 0.92);
-  pointer-events: none;
-}
-.lab-row {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 40px;
-}
-.lab-disc {
-  width: 124px;
-  height: 124px;
-}
-.lab-pill {
-  width: 300px;
-  height: 88px;
-}
-.lab-card {
-  width: 190px;
-  height: 132px;
-}
-.lab-label {
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-.site.glass .vpill.on,
-.site.glass .stage-hint {
-  color: #fff;
-}
-.site.glass .variants {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(16px);
-}
-.site.glass .vpill {
-  color: rgba(255, 255, 255, 0.6);
-}
-.site.glass .vpill.on {
-  background: rgba(255, 255, 255, 0.18);
-}
-.site.glass .stage-hint {
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-}
-
 /* menu */
 .gm-action,
 .gm-main {
@@ -1432,4 +1342,100 @@ button.gl {
 .seg-btn.on {
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
+}
+
+/* ------------------------------------------------------------ lens lab */
+/* the test scene: the filter is on .lens-content, so what bends is the page */
+.lens-scene {
+  position: relative;
+  height: 560px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #fff;
+  touch-action: none;
+  cursor: none;
+  user-select: none;
+}
+.lens-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.lens-content {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 58% 1fr;
+}
+.lens-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.lens-right {
+  display: grid;
+  grid-template-rows: 1.35fr 1fr 0.9fr;
+  min-width: 0;
+}
+.lens-type {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 34px;
+  background: #fff;
+  color: #0a0a0c;
+}
+.lens-word {
+  font-family: 'Baloo 2', 'Quicksand', ui-rounded, system-ui, sans-serif;
+  font-size: 148px;
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+.lens-sub {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #0a0a0c;
+}
+.lens-lines {
+  background:
+    repeating-linear-gradient(90deg, #0a0a0c 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(0deg, #0a0a0c 0 1px, transparent 1px 22px),
+    #f3f3f6;
+}
+.lens-gradient {
+  background: linear-gradient(90deg, #2b5cff 0%, #22d3ee 26%, #8b5cf6 50%, #ff4fa3 74%, #ff8a3d 100%);
+}
+.lens-glass {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 300px;
+  height: 200px;
+  border-radius: 48px;
+  pointer-events: none;
+  will-change: transform;
+  /* depth: one low contact shadow, nothing drawn on the glass itself */
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.16);
+}
+.lens-refract {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.lens-spec {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.lens-hint {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }

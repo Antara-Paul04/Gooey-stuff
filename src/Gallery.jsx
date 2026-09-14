@@ -11,9 +11,9 @@ import {
 } from './demos.jsx'
 import { BounceLoader, SpinnerDemo } from './loaders.jsx'
 import { wallpaperURL } from './glass.jsx'
+import { LensLab } from './lens.jsx'
 import {
   GlassDock,
-  GlassLab,
   GlassLoader,
   GlassMenu,
   GlassSearch,
@@ -632,12 +632,12 @@ export default function Gallery() {
                 <span className="doc-chip">{NavIcon.lab}</span>
                 <h1>Material</h1>
                 <p className="doc-blurb">
-                  The glass on its own, over hard colour. Nothing here is a border or a shadow: the edge is where the
-                  bezel bends the bands underneath, the highlight is light on that curve, and the centre stays clear.
-                  Move the cursor across a lens — the surface gives slightly and the light follows.
+                  One lens over a photograph, black type, hairlines and a gradient. Move it around: what bends is the
+                  page itself — a displacement map rasterised from the lens geometry drives an SVG filter on the live
+                  content, so the picture, the letters and the lines all pass through the curved rim.
                 </p>
               </div>
-              <GlassLab />
+              <LensLab />
             </>
           ) : (
             <>

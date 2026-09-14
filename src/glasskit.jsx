@@ -342,25 +342,3 @@ export function GlassLoader() {
     </div>
   )
 }
-
-/* ----------------------------------------------------------------- lab --
-   The material on its own: three lenses over hard colour bands that drift
-   underneath, and a headline behind them, so the bending is unmistakable.
-   Move the cursor across them. */
-export function GlassLab() {
-  return (
-    <div className="lab">
-      <div className="lab-bg" aria-hidden="true" />
-      <div className="lab-text" aria-hidden="true">
-        Liquid Glass
-      </div>
-      <div className="lab-row">
-        <Glass className="lab-disc" radius={62} />
-        <Glass className="lab-pill" radius={44}>
-          <span className="lab-label">Liquid Glass</span>
-        </Glass>
-        <Glass className="lab-card" radius={28} />
-      </div>
-    </div>
-  )
-}
