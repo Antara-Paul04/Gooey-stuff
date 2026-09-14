@@ -440,7 +440,7 @@ export function Glass({
               <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="amb" />
               <feComposite in="lens0" in2="amb" operator="arithmetic" k2={1 - tint - ambient} k3={ambient} k4={tint} result="lens1" />
               {/* 7 · thickness: the rim holds a little less light than the top */}
-              <feComposite in="lens1" in2="core" operator="arithmetic" k1="0.12" k2="0.88" result="lens2" />
+              <feComposite in="lens1" in2="core" operator="arithmetic" k1="0.05" k2="0.95" result="lens2" />
               {/* 8 · the shine: a thin line riding the very edge, lit where the rim bends toward the
                   light (top-left) with a fainter return along the opposite arc — read straight off
                   the refraction map, so it follows the geometry and the cursor's lean */}
@@ -461,9 +461,9 @@ export function Glass({
               </feComponentTransfer>
               <feComposite in="face" in2="edgeThin" operator="arithmetic" k1="0.95" result="shine" />
               <feComponentTransfer in="edge" result="contour">
-                <feFuncR type="gamma" amplitude="0.16" exponent="8" offset="0" />
-                <feFuncG type="gamma" amplitude="0.16" exponent="8" offset="0" />
-                <feFuncB type="gamma" amplitude="0.16" exponent="8" offset="0" />
+                <feFuncR type="gamma" amplitude="0.08" exponent="8" offset="0" />
+                <feFuncG type="gamma" amplitude="0.08" exponent="8" offset="0" />
+                <feFuncB type="gamma" amplitude="0.08" exponent="8" offset="0" />
               </feComponentTransfer>
               <feComposite in="lens2" in2="shine" operator="arithmetic" k2="1" k3="1" result="lens3" />
               <feComposite in="lens3" in2="contour" operator="arithmetic" k2="1" k3="1" result="lens4" />
